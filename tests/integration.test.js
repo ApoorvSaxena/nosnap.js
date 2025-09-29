@@ -23,16 +23,43 @@ describe('AnimatedNoiseText Integration', () => {
   let mockCanvas;
 
   beforeEach(() => {
-    // Create a mock canvas element
-    mockCanvas = {
-      getContext: jest.fn(() => ({
-        canvas: mockCanvas,
-        fillRect: jest.fn(),
-        clearRect: jest.fn()
-      })),
+    // Create a proper mock canvas element that passes instanceof check
+    mockCanvas = document.createElement('canvas');
+    mockCanvas.width = 800;
+    mockCanvas.height = 600;
+    
+    // Mock getBoundingClientRect for CanvasManager
+    mockCanvas.getBoundingClientRect = jest.fn(() => ({
       width: 800,
-      height: 600
+      height: 600,
+      top: 0,
+      left: 0,
+      right: 800,
+      bottom: 600
+    }));
+    
+    // Mock the canvas context
+    const mockContext = {
+      canvas: mockCanvas,
+      fillRect: jest.fn(),
+      clearRect: jest.fn(),
+      scale: jest.fn(),
+      drawImage: jest.fn(),
+      fillStyle: '',
+      font: '',
+      textAlign: '',
+      textBaseline: '',
+      fillText: jest.fn(),
+      measureText: jest.fn(() => ({ width: 100 })),
+      getImageData: jest.fn(() => ({
+        data: new Uint8ClampedArray(800 * 600 * 4),
+        width: 800,
+        height: 600
+      })),
+      imageSmoothingEnabled: true
     };
+    
+    mockCanvas.getContext = jest.fn(() => mockContext);
   });
 
   describe('constructor with ConfigManager', () => {

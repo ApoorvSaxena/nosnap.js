@@ -3,11 +3,11 @@
  * A JavaScript library for creating animated noise text effects on HTML5 canvas
  */
 
-// Import component classes (to be implemented in later tasks)
-// import CanvasManager from './components/CanvasManager.js';
+// Import all component classes
+import CanvasManager from './components/CanvasManager.js';
 import NoiseGenerator from './components/NoiseGenerator.js';
-// import TextRenderer from './components/TextRenderer.js';
-// import AnimationController from './components/AnimationController.js';
+import TextRenderer from './components/TextRenderer.js';
+import AnimationController from './components/AnimationController.js';
 import ConfigManager from './components/ConfigManager.js';
 
 /**
@@ -16,7 +16,12 @@ import ConfigManager from './components/ConfigManager.js';
  */
 class AnimatedNoiseText {
   constructor(canvas, options = {}) {
-    // Initialize configuration manager
+    // Validate canvas parameter (Requirement 1.2)
+    if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
+      throw new Error('AnimatedNoiseText requires a valid HTMLCanvasElement as the first parameter');
+    }
+    
+    // Initialize configuration manager (Requirement 1.4)
     this.configManager = new ConfigManager();
     
     // Validate and merge configuration
@@ -28,50 +33,115 @@ class AnimatedNoiseText {
       console.warn('AnimatedNoiseText configuration warnings:', configResult.warnings);
     }
     
-    // Store canvas reference
+    // Store canvas reference and state
     this.canvas = canvas;
     this.isRunning = false;
+    this.isDestroyed = false;
     
-    // Initialize NoiseGenerator
-    this.noiseGenerator = new NoiseGenerator(this.config.cellSize);
-    
-    // Placeholder for other components - will be completed in later tasks
+    // Initialize all component classes
+    try {
+      // Canvas management with resize handling (Requirement 1.2)
+      this.canvasManager = new CanvasManager(canvas);
+      
+      // Noise generation (Requirement 2.2)
+      this.noiseGenerator = new NoiseGenerator(this.config.cellSize);
+      
+      // Text rendering with configuration (Requirement 2.1)
+      this.textRenderer = new TextRenderer(this.config);
+      
+      // Animation control (Requirement 3.1)
+      this.animationController = new AnimationController(this.config.stepMs);
+      
+      // Set up resize handling
+      this.canvasManager.handleResize((dimensions) => {
+        if (!this.isDestroyed) {
+          this._handleResize(dimensions);
+        }
+      });
+      
+      // Initialize animation resources
+      this._initializeResources();
+      
+    } catch (error) {
+      // Clean up on initialization failure
+      this._cleanup();
+      throw new Error(`Failed to initialize AnimatedNoiseText: ${error.message}`);
+    }
   }
 
   /**
-   * Start the animation
+   * Start the animation (Requirement 3.1)
    */
   start() {
-    // To be implemented in later tasks
-    this.isRunning = true;
+    if (this.isDestroyed) {
+      throw new Error('Cannot start animation on destroyed instance');
+    }
+    
+    if (this.isRunning) {
+      return; // Already running
+    }
+    
+    try {
+      // Start animation controller with render callback
+      this.animationController.start((offset) => {
+        this._renderFrame(offset);
+      });
+      
+      this.isRunning = true;
+    } catch (error) {
+      console.error('Failed to start animation:', error);
+      throw error;
+    }
   }
 
   /**
-   * Stop the animation
+   * Stop the animation (Requirement 3.2)
    */
   stop() {
-    // To be implemented in later tasks
-    this.isRunning = false;
+    if (!this.isRunning) {
+      return; // Already stopped
+    }
+    
+    try {
+      // Stop animation controller
+      this.animationController.stop();
+      this.isRunning = false;
+    } catch (error) {
+      console.error('Failed to stop animation:', error);
+    }
   }
 
   /**
-   * Destroy the animation and clean up resources
+   * Destroy the animation and clean up resources (Requirement 3.4)
    */
   destroy() {
-    // To be implemented in later tasks
+    if (this.isDestroyed) {
+      return; // Already destroyed
+    }
+    
+    // Stop animation first
     this.stop();
+    
+    // Clean up all resources
+    this._cleanup();
+    
+    this.isDestroyed = true;
   }
 
   /**
-   * Update the text content
+   * Update the text content (Requirement 5.1)
    * @param {string} text - New text to display
    */
   setText(text) {
+    if (this.isDestroyed) {
+      throw new Error('Cannot set text on destroyed instance');
+    }
+    
     // Update configuration with new text
     this.updateConfig({ text });
     
-    // TODO: Trigger text mask regeneration
-    // This will be implemented in later tasks when TextRenderer is available
+    // Regenerate text mask with new text
+    this._generateTextMask();
   }
 
   /**
@@ -79,8 +149,12 @@ class AnimatedNoiseText {
    * @param {Object} newOptions - New configuration options
    */
   updateConfig(newOptions) {
+    if (this.isDestroyed) {
+      throw new Error('Cannot update config on destroyed instance');
+    }
+    
     // Store old config for comparison
-    const oldConfig = this.config;
+    const oldConfig = { ...this.config };
     
     // Merge new options with existing configuration
     const mergedOptions = { ...this.config, ...newOptions };
@@ -93,13 +167,172 @@ class AnimatedNoiseText {
       console.warn('AnimatedNoiseText configuration warnings:', configResult.warnings);
     }
     
+    // Update components that depend on configuration
+    this._updateComponentsFromConfig(oldConfig);
+  }
+
+  /**
+   * Initialize animation resources
+   * @private
+   */
+  _initializeResources() {
+    const dimensions = this.canvasManager.getCanvasDimensions();
+    
+    // Create offscreen canvases for compositing
+    this._createOffscreenCanvases(dimensions);
+    
+    // Generate initial text mask
+    this._generateTextMask();
+    
+    // Generate noise pattern
+    this._generateNoisePattern();
+  }
+
+  /**
+   * Create offscreen canvases for animation compositing
+   * @private
+   * @param {Object} dimensions - Canvas dimensions
+   */
+  _createOffscreenCanvases(dimensions) {
+    // Circle canvas for moving circle effect
+    this.circleCanvas = document.createElement('canvas');
+    this.circleCanvas.width = dimensions.displayWidth;
+    this.circleCanvas.height = dimensions.displayHeight;
+    this.circleCtx = this.circleCanvas.getContext('2d');
+    
+    // Composite canvas for final composition
+    this.compositeCanvas = document.createElement('canvas');
+    this.compositeCanvas.width = dimensions.displayWidth;
+    this.compositeCanvas.height = dimensions.displayHeight;
+    this.compositeCtx = this.compositeCanvas.getContext('2d');
+  }
+
+  /**
+   * Generate text mask using TextRenderer
+   * @private
+   */
+  _generateTextMask() {
+    const dimensions = this.canvasManager.getCanvasDimensions();
+    
+    this.textMask = this.textRenderer.createPixelatedTextMask(
+      this.config.text,
+      this.config.maskBlockSize,
+      dimensions.displayWidth,
+      dimensions.displayHeight
+    );
+  }
+
+  /**
+   * Generate noise pattern using NoiseGenerator
+   * @private
+   */
+  _generateNoisePattern() {
+    const dimensions = this.canvasManager.getCanvasDimensions();
+    
+    this.noiseCanvas = this.noiseGenerator.createNoiseCanvas(
+      dimensions.displayWidth,
+      dimensions.displayHeight
+    );
+  }
+
+  /**
+   * Handle canvas resize events
+   * @private
+   * @param {Object} dimensions - New canvas dimensions
+   */
+  _handleResize(dimensions) {
+    // Recreate offscreen canvases with new dimensions
+    this._createOffscreenCanvases(dimensions);
+    
+    // Regenerate text mask and noise pattern
+    this._generateTextMask();
+    this._generateNoisePattern();
+  }
+
+  /**
+   * Update components when configuration changes
+   * @private
+   * @param {Object} oldConfig - Previous configuration
+   */
+  _updateComponentsFromConfig(oldConfig) {
     // Update NoiseGenerator if cellSize changed
     if (oldConfig.cellSize !== this.config.cellSize) {
       this.noiseGenerator.setCellSize(this.config.cellSize);
+      this._generateNoisePattern();
     }
     
-    // TODO: Trigger re-initialization of other components that depend on config
-    // This will be implemented in later tasks when other components are available
+    // Update TextRenderer configuration
+    this.textRenderer.updateConfig(this.config);
+    
+    // Update AnimationController if stepMs changed
+    if (oldConfig.stepMs !== this.config.stepMs) {
+      this.animationController.setStepInterval(this.config.stepMs);
+    }
+    
+    // Regenerate text mask if text-related config changed
+    if (oldConfig.text !== this.config.text ||
+        oldConfig.fontSize !== this.config.fontSize ||
+        oldConfig.fontWeight !== this.config.fontWeight ||
+        oldConfig.fontFamily !== this.config.fontFamily ||
+        oldConfig.maskBlockSize !== this.config.maskBlockSize) {
+      this._generateTextMask();
+    }
+  }
+
+  /**
+   * Render a single animation frame
+   * @private
+   * @param {number} offset - Current animation offset
+   */
+  _renderFrame(offset) {
+    if (this.isDestroyed || !this.isRunning) {
+      return;
+    }
+    
+    const ctx = this.canvasManager.getContext();
+    const dimensions = this.canvasManager.getCanvasDimensions();
+    
+    // Clear main canvas
+    ctx.clearRect(0, 0, dimensions.displayWidth, dimensions.displayHeight);
+    
+    // This is a placeholder for the actual animation rendering
+    // The full animation pipeline will be implemented in task 8
+    // For now, just render the text mask to show integration is working
+    if (this.textMask) {
+      ctx.drawImage(this.textMask, 
+        (dimensions.displayWidth - this.textMask.width) / 2,
+        (dimensions.displayHeight - this.textMask.height) / 2
+      );
+    }
+  }
+
+  /**
+   * Clean up all resources
+   * @private
+   */
+  _cleanup() {
+    try {
+      // Clean up canvas manager
+      if (this.canvasManager) {
+        this.canvasManager.cleanup();
+      }
+      
+      // Clear text renderer cache
+      if (this.textRenderer) {
+        this.textRenderer.clearCache();
+      }
+      
+      // Clear references to offscreen canvases
+      this.circleCanvas = null;
+      this.circleCtx = null;
+      this.compositeCanvas = null;
+      this.compositeCtx = null;
+      this.textMask = null;
+      this.noiseCanvas = null;
+      
+    } catch (error) {
+      console.error('Error during cleanup:', error);
+    }
   }
 }
 
