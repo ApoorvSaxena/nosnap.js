@@ -329,14 +329,44 @@ class AnimatedNoiseText {
    * @param {Object} dimensions - New canvas dimensions
    */
   _handleResize(dimensions) {
-    // Recreate offscreen canvases with new dimensions (will be resized to match text mask)
-    this._createOffscreenCanvases(dimensions);
+    if (this.isDestroyed) return;
     
-    // Regenerate text mask first (this will resize offscreen canvases to match)
-    this._generateTextMask();
+    // Store animation state to ensure smooth continuation (Requirement 4.4)
+    const wasRunning = this.isRunning;
+    const currentOffset = this.animationController ? this.animationController.getCurrentOffset() : 0;
     
-    // Then regenerate noise pattern to match text mask dimensions
-    this._generateNoisePattern();
+    try {
+      // Temporarily pause animation during resize to prevent rendering issues
+      if (wasRunning) {
+        this.animationController.pause();
+      }
+      
+      // Recreate offscreen canvases with new dimensions (Requirement 4.1)
+      this._createOffscreenCanvases(dimensions);
+      
+      // Regenerate text mask first (Requirement 4.2)
+      this._generateTextMask();
+      
+      // Then regenerate noise pattern to match text mask dimensions (Requirement 4.2)
+      this._generateNoisePattern();
+      
+      // Resume animation if it was running, maintaining smooth continuation
+      if (wasRunning) {
+        this.animationController.resume();
+      }
+      
+    } catch (error) {
+      console.error('Error during resize handling:', error);
+      
+      // Attempt to restart animation if it was running
+      if (wasRunning && !this.isRunning) {
+        try {
+          this.start();
+        } catch (restartError) {
+          console.error('Failed to restart animation after resize error:', restartError);
+        }
+      }
+    }
   }
 
   /**

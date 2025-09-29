@@ -11,6 +11,7 @@ class CanvasManager {
     this.ctx = canvas.getContext('2d');
     this.resizeCallback = null;
     this.resizeHandler = null;
+    this.containerObserver = null;
     this.isDestroyed = false;
     
     if (!this.ctx) {
@@ -64,17 +65,15 @@ class CanvasManager {
     
     this.resizeCallback = callback;
     
-    // Remove existing handler if it exists
-    if (this.resizeHandler) {
-      window.removeEventListener('resize', this.resizeHandler);
-    }
+    // Remove existing handlers if they exist
+    this._cleanupResizeHandlers();
     
     // Create debounced resize handler
     let resizeTimeout;
-    this.resizeHandler = () => {
+    const debouncedResize = () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
-        if (!this.isDestroyed) {
+        if (!this.isDestroyed && this._hasCanvasSizeChanged()) {
           this.setupCanvas();
           if (this.resizeCallback) {
             this.resizeCallback(this.getCanvasDimensions());
@@ -83,7 +82,33 @@ class CanvasManager {
       }, 100); // 100ms debounce
     };
     
+    // Listen for window resize events (Requirement 4.1)
+    this.resizeHandler = debouncedResize;
     window.addEventListener('resize', this.resizeHandler);
+    
+    // Listen for container size changes using ResizeObserver (Requirement 4.4)
+    if (typeof ResizeObserver !== 'undefined') {
+      this.containerObserver = new ResizeObserver((entries) => {
+        // Only trigger if the canvas container actually changed size
+        for (const entry of entries) {
+          if (entry.target === this.canvas || entry.target === this.canvas.parentElement) {
+            debouncedResize();
+            break;
+          }
+        }
+      });
+      
+      // Observe the canvas element and its parent container
+      this.containerObserver.observe(this.canvas);
+      if (this.canvas.parentElement) {
+        this.containerObserver.observe(this.canvas.parentElement);
+      }
+    }
+    
+    // Fallback: periodic size check for browsers without ResizeObserver
+    if (typeof ResizeObserver === 'undefined') {
+      this._startPeriodicSizeCheck();
+    }
   }
 
   /**
@@ -146,15 +171,74 @@ class CanvasManager {
   }
 
   /**
+   * Checks if the canvas size has actually changed since last setup
+   * @returns {boolean} True if canvas size changed
+   * @private
+   */
+  _hasCanvasSizeChanged() {
+    if (this.isDestroyed) return false;
+    
+    const rect = this.canvas.getBoundingClientRect();
+    const dpr = this.getDevicePixelRatio();
+    
+    // Check if display dimensions or device pixel ratio changed significantly
+    const displayWidthChanged = Math.abs(rect.width - this.displayWidth) > 1;
+    const displayHeightChanged = Math.abs(rect.height - this.displayHeight) > 1;
+    const dprChanged = Math.abs(dpr - this.devicePixelRatio) > 0.1;
+    
+    return displayWidthChanged || displayHeightChanged || dprChanged;
+  }
+
+  /**
+   * Starts periodic size checking for browsers without ResizeObserver
+   * @private
+   */
+  _startPeriodicSizeCheck() {
+    if (this.isDestroyed) return;
+    
+    // Check every 500ms for size changes
+    this.sizeCheckInterval = setInterval(() => {
+      if (!this.isDestroyed && this._hasCanvasSizeChanged()) {
+        this.setupCanvas();
+        if (this.resizeCallback) {
+          this.resizeCallback(this.getCanvasDimensions());
+        }
+      }
+    }, 500);
+  }
+
+  /**
+   * Cleans up resize event handlers and observers
+   * @private
+   */
+  _cleanupResizeHandlers() {
+    // Remove window resize listener
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler);
+      this.resizeHandler = null;
+    }
+    
+    // Disconnect ResizeObserver
+    if (this.containerObserver) {
+      this.containerObserver.disconnect();
+      this.containerObserver = null;
+    }
+    
+    // Clear periodic size check interval
+    if (this.sizeCheckInterval) {
+      clearInterval(this.sizeCheckInterval);
+      this.sizeCheckInterval = null;
+    }
+  }
+
+  /**
    * Cleans up resources and event listeners
    */
   cleanup() {
     this.isDestroyed = true;
     
-    if (this.resizeHandler) {
-      window.removeEventListener('resize', this.resizeHandler);
-      this.resizeHandler = null;
-    }
+    // Clean up all resize handlers and observers
+    this._cleanupResizeHandlers();
     
     this.resizeCallback = null;
     

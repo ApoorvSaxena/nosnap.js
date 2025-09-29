@@ -170,6 +170,12 @@ describe('CanvasManager', () => {
       const callback = jest.fn();
       canvasManager.handleResize(callback);
       
+      // Mock canvas size change to trigger resize
+      canvas.getBoundingClientRect = jest.fn().mockReturnValue({
+        width: 1000,
+        height: 800
+      });
+      
       // Simulate multiple rapid resize events
       const resizeHandler = canvasManager.resizeHandler;
       resizeHandler();
