@@ -5,7 +5,7 @@
 
 // Import component classes (to be implemented in later tasks)
 // import CanvasManager from './components/CanvasManager.js';
-// import NoiseGenerator from './components/NoiseGenerator.js';
+import NoiseGenerator from './components/NoiseGenerator.js';
 // import TextRenderer from './components/TextRenderer.js';
 // import AnimationController from './components/AnimationController.js';
 import ConfigManager from './components/ConfigManager.js';
@@ -31,6 +31,9 @@ class AnimatedNoiseText {
     // Store canvas reference
     this.canvas = canvas;
     this.isRunning = false;
+    
+    // Initialize NoiseGenerator
+    this.noiseGenerator = new NoiseGenerator(this.config.cellSize);
     
     // Placeholder for other components - will be completed in later tasks
   }
@@ -76,6 +79,9 @@ class AnimatedNoiseText {
    * @param {Object} newOptions - New configuration options
    */
   updateConfig(newOptions) {
+    // Store old config for comparison
+    const oldConfig = this.config;
+    
     // Merge new options with existing configuration
     const mergedOptions = { ...this.config, ...newOptions };
     const configResult = this.configManager.createConfig(mergedOptions);
@@ -87,7 +93,12 @@ class AnimatedNoiseText {
       console.warn('AnimatedNoiseText configuration warnings:', configResult.warnings);
     }
     
-    // TODO: Trigger re-initialization of components that depend on config
+    // Update NoiseGenerator if cellSize changed
+    if (oldConfig.cellSize !== this.config.cellSize) {
+      this.noiseGenerator.setCellSize(this.config.cellSize);
+    }
+    
+    // TODO: Trigger re-initialization of other components that depend on config
     // This will be implemented in later tasks when other components are available
   }
 }
