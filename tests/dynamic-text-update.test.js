@@ -3,7 +3,7 @@
  * Covers Requirements 5.1, 5.2, 5.3, 5.4
  */
 
-import AnimatedNoiseText from '../src/index.js';
+import NoSnap from '../src/index.js';
 import { createMockCanvas } from './test-utils/canvas-mock.js';
 
 // Mock document.createElement to return our mock canvas
@@ -27,7 +27,7 @@ describe('Dynamic Text Update Functionality', () => {
 
   beforeEach(() => {
     mockCanvas = createMockCanvas();
-    instance = new AnimatedNoiseText(mockCanvas, { text: 'INITIAL' });
+    instance = new NoSnap(mockCanvas, { text: 'INITIAL' });
   });
 
   afterEach(() => {

@@ -1,9 +1,9 @@
 /**
- * Tests for the main AnimatedNoiseText class integration
+ * Tests for the main NoSnap class integration
  * These tests focus on the class structure and API without canvas operations
  */
 
-import AnimatedNoiseText from '../src/index.js';
+import NoSnap from '../src/index.js';
 
 // Mock canvas and context for testing
 const createMockCanvas = () => {
@@ -99,7 +99,7 @@ afterAll(() => {
   document.createElement = originalCreateElement;
 });
 
-describe('AnimatedNoiseText Main Class', () => {
+describe('NoSnap Main Class', () => {
   let mockCanvas;
 
   beforeEach(() => {
@@ -108,9 +108,9 @@ describe('AnimatedNoiseText Main Class', () => {
 
   describe('Constructor', () => {
     test('should create instance with valid canvas and default options', () => {
-      const instance = new AnimatedNoiseText(mockCanvas);
+      const instance = new NoSnap(mockCanvas);
       
-      expect(instance).toBeInstanceOf(AnimatedNoiseText);
+      expect(instance).toBeInstanceOf(NoSnap);
       expect(instance.canvas).toBe(mockCanvas);
       expect(instance.config).toBeDefined();
       expect(instance.config.text).toBe('HELLO');
@@ -125,7 +125,7 @@ describe('AnimatedNoiseText Main Class', () => {
         circleRadius: 250
       };
       
-      const instance = new AnimatedNoiseText(mockCanvas, options);
+      const instance = new NoSnap(mockCanvas, options);
       
       expect(instance.config.text).toBe('CUSTOM');
       expect(instance.config.cellSize).toBe(4);
@@ -134,16 +134,16 @@ describe('AnimatedNoiseText Main Class', () => {
 
     test('should throw error with invalid canvas', () => {
       expect(() => {
-        new AnimatedNoiseText(null);
-      }).toThrow('AnimatedNoiseText constructor requires a canvas element as the first parameter');
+        new NoSnap(null);
+      }).toThrow('NoSnap constructor requires a canvas element as the first parameter');
 
       expect(() => {
-        new AnimatedNoiseText({});
-      }).toThrow('AnimatedNoiseText requires an HTMLCanvasElement');
+        new NoSnap({});
+      }).toThrow('NoSnap requires an HTMLCanvasElement');
     });
 
     test('should initialize all component instances', () => {
-      const instance = new AnimatedNoiseText(mockCanvas);
+      const instance = new NoSnap(mockCanvas);
       
       expect(instance.canvasManager).toBeDefined();
       expect(instance.noiseGenerator).toBeDefined();
@@ -157,7 +157,7 @@ describe('AnimatedNoiseText Main Class', () => {
     let instance;
 
     beforeEach(() => {
-      instance = new AnimatedNoiseText(mockCanvas);
+      instance = new NoSnap(mockCanvas);
     });
 
     test('should have start method', () => {
@@ -208,7 +208,7 @@ describe('AnimatedNoiseText Main Class', () => {
     let instance;
 
     beforeEach(() => {
-      instance = new AnimatedNoiseText(mockCanvas);
+      instance = new NoSnap(mockCanvas);
     });
 
     test('should throw error when calling methods on destroyed instance', () => {
@@ -251,13 +251,13 @@ describe('AnimatedNoiseText Main Class', () => {
     test('should handle configuration warnings', () => {
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
       
-      const instance = new AnimatedNoiseText(mockCanvas, {
+      const instance = new NoSnap(mockCanvas, {
         cellSize: 0, // Invalid
         text: 'VALID'
       });
       
       expect(consoleSpy).toHaveBeenCalledWith(
-        'AnimatedNoiseText configuration warnings:',
+        'NoSnap configuration warnings:',
         expect.any(Array)
       );
       
@@ -269,7 +269,7 @@ describe('AnimatedNoiseText Main Class', () => {
     });
 
     test('should update components when configuration changes', () => {
-      const instance = new AnimatedNoiseText(mockCanvas, { cellSize: 2 });
+      const instance = new NoSnap(mockCanvas, { cellSize: 2 });
       
       // Change cellSize should update NoiseGenerator
       instance.updateConfig({ cellSize: 4 });

@@ -1,5 +1,5 @@
 /**
- * Animated Noise Text Library
+ * nosnap.js
  * A JavaScript library for creating animated noise text effects on HTML5 canvas
  */
 
@@ -11,10 +11,10 @@ import AnimationController from './components/AnimationController.js';
 import ConfigManager from './components/ConfigManager.js';
 
 /**
- * Main AnimatedNoiseText class
+ * Main NoSnap class
  * Entry point for the library that orchestrates all components
  */
-class AnimatedNoiseText {
+class NoSnap {
   constructor(canvas, options = {}) {
     // Comprehensive input validation for constructor parameters
     this._validateConstructorInputs(canvas, options);
@@ -46,7 +46,7 @@ class AnimatedNoiseText {
     
     // Log warnings if any configuration issues were found
     if (configResult && configResult.warnings.length > 0) {
-      console.warn('AnimatedNoiseText configuration warnings:', configResult.warnings);
+      console.warn('NoSnap configuration warnings:', configResult.warnings);
     }
     
     // Store canvas reference and state
@@ -72,18 +72,18 @@ class AnimatedNoiseText {
   _validateConstructorInputs(canvas, options) {
     // Canvas validation with specific error messages
     if (canvas === null || canvas === undefined) {
-      throw new Error('AnimatedNoiseText constructor requires a canvas element as the first parameter. Received: ' + canvas);
+      throw new Error('NoSnap constructor requires a canvas element as the first parameter. Received: ' + canvas);
     }
     
     if (!(canvas instanceof HTMLCanvasElement)) {
       const actualType = canvas.constructor ? canvas.constructor.name : typeof canvas;
-      throw new Error(`AnimatedNoiseText requires an HTMLCanvasElement. Received: ${actualType}. Please pass a valid <canvas> element.`);
+      throw new Error(`NoSnap requires an HTMLCanvasElement. Received: ${actualType}. Please pass a valid <canvas> element.`);
     }
     
     // Check if canvas is attached to DOM (warning, not error)
     try {
       if (!canvas.parentNode) {
-        console.warn('AnimatedNoiseText: Canvas element is not attached to the DOM. This may cause rendering issues.');
+        console.warn('NoSnap: Canvas element is not attached to the DOM. This may cause rendering issues.');
       }
     } catch (error) {
       // Ignore parentNode access errors in test environments
@@ -94,13 +94,13 @@ class AnimatedNoiseText {
     if (rect.width === 0 || rect.height === 0) {
       // Suppress warning in test environments to reduce console noise
       if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
-        console.warn('AnimatedNoiseText: Canvas has zero dimensions. Animation may not be visible until canvas is properly sized.');
+        console.warn('NoSnap: Canvas has zero dimensions. Animation may not be visible until canvas is properly sized.');
       }
     }
     
     // Options validation
     if (options !== null && options !== undefined && typeof options !== 'object') {
-      throw new Error(`AnimatedNoiseText options must be an object or undefined. Received: ${typeof options}`);
+      throw new Error(`NoSnap options must be an object or undefined. Received: ${typeof options}`);
     }
     
     // Check for common canvas context issues
@@ -192,7 +192,7 @@ class AnimatedNoiseText {
 
     // Log initialization summary
     if (this.initializationErrors.length > 0) {
-      console.warn('AnimatedNoiseText initialized with errors:', this.initializationErrors);
+      console.warn('NoSnap initialized with errors:', this.initializationErrors);
     }
   }
 
@@ -451,7 +451,7 @@ class AnimatedNoiseText {
   start() {
     // Validate instance state
     if (this.isDestroyed) {
-      throw new Error('Cannot start animation on destroyed instance. Please create a new AnimatedNoiseText instance.');
+      throw new Error('Cannot start animation on destroyed instance. Please create a new NoSnap instance.');
     }
     
     if (this.isRunning) {
@@ -658,7 +658,7 @@ class AnimatedNoiseText {
     
     // Log warnings if any configuration issues were found
     if (configResult.warnings.length > 0) {
-      console.warn('AnimatedNoiseText configuration warnings:', configResult.warnings);
+      console.warn('NoSnap configuration warnings:', configResult.warnings);
     }
     
     // Update components that depend on configuration
@@ -1531,11 +1531,11 @@ class AnimatedNoiseText {
 }
 
 // Export the main class as default
-export default AnimatedNoiseText;
+export default NoSnap;
 
 // Named exports for main class and all components
 export { 
-  AnimatedNoiseText,
+  NoSnap,
   CanvasManager,
   NoiseGenerator,
   TextRenderer,

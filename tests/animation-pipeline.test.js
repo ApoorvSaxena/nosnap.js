@@ -3,7 +3,7 @@
  * Tests for the animation rendering pipeline functionality
  */
 
-import AnimatedNoiseText from '../src/index.js';
+import NoSnap from '../src/index.js';
 
 // Mock canvas and context for testing
 const createMockCanvas = () => {
@@ -91,7 +91,7 @@ describe('Animation Rendering Pipeline', () => {
 
   beforeEach(() => {
     canvas = createMockCanvas();
-    animatedText = new AnimatedNoiseText(canvas, {
+    animatedText = new NoSnap(canvas, {
       text: 'TEST',
       cellSize: 2,
       stepPixels: 4,

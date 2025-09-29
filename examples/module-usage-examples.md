@@ -20,11 +20,11 @@ This document demonstrates how to use the Animated Noise Text library with diffe
 
 ```javascript
 // Import the main class (default export)
-import AnimatedNoiseText from 'animated-noise-text';
+import NoSnap from 'nosnap.js';
 
 // Usage
 const canvas = document.getElementById('myCanvas');
-const animation = new AnimatedNoiseText(canvas, {
+const animation = new NoSnap(canvas, {
   text: 'HELLO WORLD',
   cellSize: 3,
   stepMs: 50
@@ -37,7 +37,7 @@ animation.start();
 
 ```javascript
 // Import named exports for advanced usage
-import { AnimatedNoiseText, CanvasManager, NoiseGenerator } from 'animated-noise-text';
+import { NoSnap, CanvasManager, NoiseGenerator } from 'nosnap.js';
 
 // Use individual components if needed
 const canvasManager = new CanvasManager(canvas);
@@ -49,10 +49,10 @@ const noiseGenerator = new NoiseGenerator(2);
 ```javascript
 // Lazy loading for better performance
 async function loadAnimation() {
-  const { default: AnimatedNoiseText } = await import('animated-noise-text');
+  const { default: NoSnap } = await import('nosnap.js');
   
   const canvas = document.getElementById('myCanvas');
-  const animation = new AnimatedNoiseText(canvas, {
+  const animation = new NoSnap(canvas, {
     text: 'DYNAMIC IMPORT',
     cellSize: 2
   });
@@ -70,10 +70,10 @@ document.getElementById('loadBtn').addEventListener('click', loadAnimation);
 
 ```javascript
 // Import the main class (default export)
-const AnimatedNoiseText = require('animated-noise-text').default;
+const NoSnap = require('nosnap.js').default;
 
 // Or destructure
-const { default: AnimatedNoiseText } = require('animated-noise-text');
+const { default: NoSnap } = require('nosnap.js');
 ```
 
 ### Node.js with Canvas
@@ -81,10 +81,10 @@ const { default: AnimatedNoiseText } = require('animated-noise-text');
 ```javascript
 // Usage in Node.js with node-canvas
 const { createCanvas } = require('canvas');
-const AnimatedNoiseText = require('animated-noise-text').default;
+const NoSnap = require('nosnap.js').default;
 
 const canvas = createCanvas(800, 600);
-const animation = new AnimatedNoiseText(canvas, {
+const animation = new NoSnap(canvas, {
   text: 'NODE.JS',
   cellSize: 2
 });
@@ -98,13 +98,13 @@ const animation = new AnimatedNoiseText(canvas, {
 ```javascript
 const express = require('express');
 const { createCanvas } = require('canvas');
-const AnimatedNoiseText = require('animated-noise-text').default;
+const NoSnap = require('nosnap.js').default;
 
 const app = express();
 
 app.get('/generate-text-image', (req, res) => {
   const canvas = createCanvas(800, 400);
-  const animation = new AnimatedNoiseText(canvas, {
+  const animation = new NoSnap(canvas, {
     text: req.query.text || 'SERVER',
     cellSize: 3
   });
@@ -129,12 +129,12 @@ app.get('/generate-text-image', (req, res) => {
   <canvas id="myCanvas" width="800" height="600"></canvas>
   
   <!-- Load the UMD build -->
-  <script src="https://unpkg.com/animated-noise-text/dist/animated-noise-text.umd.min.js"></script>
+  <script src="https://unpkg.com/nosnap.js/dist/nosnap.js.umd.min.js"></script>
   
   <script>
     // Access via global namespace
     const canvas = document.getElementById('myCanvas');
-    const animation = new AnimatedNoiseText(canvas, {
+    const animation = new NoSnap(canvas, {
       text: 'UMD GLOBAL',
       cellSize: 4
     });
@@ -151,14 +151,14 @@ app.get('/generate-text-image', (req, res) => {
 // Configure RequireJS
 require.config({
   paths: {
-    'animated-noise-text': 'https://unpkg.com/animated-noise-text/dist/animated-noise-text.umd'
+    'nosnap.js': 'https://unpkg.com/nosnap.js/dist/nosnap.js.umd'
   }
 });
 
 // Use with RequireJS
-require(['animated-noise-text'], function(AnimatedNoiseText) {
+require(['nosnap.js'], function(NoSnap) {
   const canvas = document.getElementById('myCanvas');
-  const animation = new AnimatedNoiseText(canvas, {
+  const animation = new NoSnap(canvas, {
     text: 'AMD MODULE',
     cellSize: 2
   });
@@ -172,10 +172,10 @@ require(['animated-noise-text'], function(AnimatedNoiseText) {
 ### Basic TypeScript Usage
 
 ```typescript
-import AnimatedNoiseText, { AnimatedNoiseTextConfig } from 'animated-noise-text';
+import NoSnap, { NoSnapConfig } from 'nosnap.js';
 
 // Configuration with full type checking
-const config: AnimatedNoiseTextConfig = {
+const config: NoSnapConfig = {
   text: 'TYPESCRIPT',
   cellSize: 3,
   stepMs: 40,
@@ -185,7 +185,7 @@ const config: AnimatedNoiseTextConfig = {
 };
 
 const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
-const animation = new AnimatedNoiseText(canvas, config);
+const animation = new NoSnap(canvas, config);
 
 // All methods have proper type definitions
 animation.start();
@@ -196,21 +196,21 @@ animation.updateConfig({ cellSize: 5 });
 ### Advanced TypeScript with Interfaces
 
 ```typescript
-import AnimatedNoiseText, { 
-  AnimatedNoiseTextConfig,
+import NoSnap, { 
+  NoSnapConfig,
   AnimationState,
   ErrorHandler 
-} from 'animated-noise-text';
+} from 'nosnap.js';
 
-interface CustomAnimationConfig extends AnimatedNoiseTextConfig {
+interface CustomAnimationConfig extends NoSnapConfig {
   customProperty?: string;
 }
 
 class AnimationManager {
-  private animations: Map<string, AnimatedNoiseText> = new Map();
+  private animations: Map<string, NoSnap> = new Map();
   
   createAnimation(id: string, canvas: HTMLCanvasElement, config: CustomAnimationConfig): void {
-    const animation = new AnimatedNoiseText(canvas, config);
+    const animation = new NoSnap(canvas, config);
     this.animations.set(id, animation);
   }
   
@@ -235,17 +235,17 @@ class AnimationManager {
 ```html
 <!-- ES Module from CDN -->
 <script type="module">
-  import AnimatedNoiseText from 'https://unpkg.com/animated-noise-text/dist/animated-noise-text.esm.js';
+  import NoSnap from 'https://unpkg.com/nosnap.js/dist/nosnap.js.esm.js';
   
   const canvas = document.getElementById('canvas');
-  const animation = new AnimatedNoiseText(canvas, { text: 'CDN DEMO' });
+  const animation = new NoSnap(canvas, { text: 'CDN DEMO' });
   animation.start();
 </script>
 
 <!-- UMD from CDN -->
-<script src="https://unpkg.com/animated-noise-text/dist/animated-noise-text.umd.min.js"></script>
+<script src="https://unpkg.com/nosnap.js/dist/nosnap.js.umd.min.js"></script>
 <script>
-  const animation = new AnimatedNoiseText(canvas, { text: 'UMD CDN' });
+  const animation = new NoSnap(canvas, { text: 'UMD CDN' });
   animation.start();
 </script>
 ```
@@ -255,11 +255,11 @@ class AnimationManager {
 ```html
 <!-- ES Module -->
 <script type="module">
-  import AnimatedNoiseText from 'https://cdn.jsdelivr.net/npm/animated-noise-text/dist/animated-noise-text.esm.js';
+  import NoSnap from 'https://cdn.jsdelivr.net/npm/nosnap.js/dist/nosnap.js.esm.js';
 </script>
 
 <!-- UMD -->
-<script src="https://cdn.jsdelivr.net/npm/animated-noise-text/dist/animated-noise-text.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/nosnap.js/dist/nosnap.js.umd.min.js"></script>
 ```
 
 ## Webpack Integration
@@ -291,7 +291,7 @@ module.exports = {
   },
   resolve: {
     alias: {
-      'animated-noise-text': path.resolve(__dirname, 'node_modules/animated-noise-text/dist/animated-noise-text.esm.js')
+      'nosnap.js': path.resolve(__dirname, 'node_modules/nosnap.js/dist/nosnap.js.esm.js')
     }
   }
 };
@@ -301,10 +301,10 @@ module.exports = {
 
 ```javascript
 // src/index.js
-import AnimatedNoiseText from 'animated-noise-text';
+import NoSnap from 'nosnap.js';
 
 const canvas = document.getElementById('canvas');
-const animation = new AnimatedNoiseText(canvas, {
+const animation = new NoSnap(canvas, {
   text: 'WEBPACK BUILD',
   cellSize: 2
 });
@@ -340,11 +340,11 @@ export default {
 
 ```javascript
 // src/main.js
-import AnimatedNoiseText from 'animated-noise-text';
+import NoSnap from 'nosnap.js';
 
 export function initAnimation(canvasId) {
   const canvas = document.getElementById(canvasId);
-  const animation = new AnimatedNoiseText(canvas, {
+  const animation = new NoSnap(canvas, {
     text: 'ROLLUP BUILD',
     cellSize: 2
   });
@@ -369,7 +369,7 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    include: ['animated-noise-text']
+    include: ['nosnap.js']
   }
 });
 ```
@@ -378,10 +378,10 @@ export default defineConfig({
 
 ```javascript
 // src/main.js
-import AnimatedNoiseText from 'animated-noise-text';
+import NoSnap from 'nosnap.js';
 
 const canvas = document.querySelector('#canvas');
-const animation = new AnimatedNoiseText(canvas, {
+const animation = new NoSnap(canvas, {
   text: 'VITE BUILD',
   cellSize: 2,
   stepMs: 32
@@ -403,19 +403,19 @@ The library supports proper module resolution through package.json exports:
 
 ```json
 {
-  "name": "animated-noise-text",
+  "name": "nosnap.js",
   "version": "1.0.0",
   "description": "A JavaScript library for creating animated noise text effects",
-  "main": "dist/animated-noise-text.cjs.js",
-  "module": "dist/animated-noise-text.esm.js",
-  "browser": "dist/animated-noise-text.umd.js",
-  "types": "dist/animated-noise-text.d.ts",
+  "main": "dist/nosnap.js.cjs.js",
+  "module": "dist/nosnap.js.esm.js",
+  "browser": "dist/nosnap.js.umd.js",
+  "types": "dist/nosnap.js.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/animated-noise-text.esm.js",
-      "require": "./dist/animated-noise-text.cjs.js",
-      "browser": "./dist/animated-noise-text.umd.js",
-      "types": "./dist/animated-noise-text.d.ts"
+      "import": "./dist/nosnap.js.esm.js",
+      "require": "./dist/nosnap.js.cjs.js",
+      "browser": "./dist/nosnap.js.umd.js",
+      "types": "./dist/nosnap.js.d.ts"
     }
   },
   "files": [
@@ -464,7 +464,7 @@ This configuration ensures that:
 
 ```javascript
 // Enable debug logging
-const animation = new AnimatedNoiseText(canvas, {
+const animation = new NoSnap(canvas, {
   text: 'DEBUG MODE',
   debug: true // If supported
 });

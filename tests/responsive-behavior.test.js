@@ -3,7 +3,7 @@
  * Tests Requirements 4.1, 4.2, 4.4
  */
 
-import AnimatedNoiseText from '../src/index.js';
+import NoSnap from '../src/index.js';
 
 // Mock window globally
 const mockAddEventListener = jest.fn();
@@ -126,7 +126,7 @@ describe('Responsive Behavior and Resize Handling', () => {
 
   describe('Requirement 4.1: Automatic canvas dimension adjustment on viewport resize', () => {
     test('should adjust canvas dimensions when window is resized', async () => {
-      animatedText = new AnimatedNoiseText(canvas, { text: 'TEST' });
+      animatedText = new NoSnap(canvas, { text: 'TEST' });
       
       const initialDimensions = animatedText.canvasManager.getCanvasDimensions();
       expect(initialDimensions.displayWidth).toBe(400);
@@ -164,7 +164,7 @@ describe('Responsive Behavior and Resize Handling', () => {
         value: 1
       });
 
-      animatedText = new AnimatedNoiseText(canvas, { text: 'TEST' });
+      animatedText = new NoSnap(canvas, { text: 'TEST' });
       
       const initialDimensions = animatedText.canvasManager.getCanvasDimensions();
       expect(initialDimensions.devicePixelRatio).toBe(1);
@@ -192,7 +192,7 @@ describe('Responsive Behavior and Resize Handling', () => {
 
   describe('Requirement 4.2: Regenerate text mask and noise patterns on resize', () => {
     test('should regenerate text mask when canvas is resized', async () => {
-      animatedText = new AnimatedNoiseText(canvas, { text: 'TEST' });
+      animatedText = new NoSnap(canvas, { text: 'TEST' });
       
       const originalTextMask = animatedText.textMask;
       expect(originalTextMask).toBeDefined();
@@ -222,7 +222,7 @@ describe('Responsive Behavior and Resize Handling', () => {
     });
 
     test('should regenerate noise pattern when canvas is resized', async () => {
-      animatedText = new AnimatedNoiseText(canvas, { text: 'TEST' });
+      animatedText = new NoSnap(canvas, { text: 'TEST' });
       
       const originalNoiseCanvas = animatedText.noiseCanvas;
       expect(originalNoiseCanvas).toBeDefined();
@@ -252,7 +252,7 @@ describe('Responsive Behavior and Resize Handling', () => {
     });
 
     test('should recreate offscreen canvases with new dimensions', async () => {
-      animatedText = new AnimatedNoiseText(canvas, { text: 'TEST' });
+      animatedText = new NoSnap(canvas, { text: 'TEST' });
       
       const originalCircleCanvas = animatedText.circleCanvas;
       const originalCompositeCanvas = animatedText.compositeCanvas;
@@ -291,7 +291,7 @@ describe('Responsive Behavior and Resize Handling', () => {
 
   describe('Requirement 4.4: Adapt to canvas container size changes without manual intervention', () => {
     test('should detect container size changes using ResizeObserver', () => {
-      animatedText = new AnimatedNoiseText(canvas, { text: 'TEST' });
+      animatedText = new NoSnap(canvas, { text: 'TEST' });
       
       // Verify ResizeObserver was created and is observing elements
       expect(global.ResizeObserver).toHaveBeenCalled();
@@ -300,7 +300,7 @@ describe('Responsive Behavior and Resize Handling', () => {
     });
 
     test('should handle container resize without manual intervention', () => {
-      animatedText = new AnimatedNoiseText(canvas, { text: 'TEST' });
+      animatedText = new NoSnap(canvas, { text: 'TEST' });
       
       // Test that ResizeObserver is set up
       expect(global.ResizeObserver).toHaveBeenCalled();
@@ -312,7 +312,7 @@ describe('Responsive Behavior and Resize Handling', () => {
     });
 
     test('should maintain smooth animation during resize', async () => {
-      animatedText = new AnimatedNoiseText(canvas, { text: 'TEST' });
+      animatedText = new NoSnap(canvas, { text: 'TEST' });
       animatedText.start();
       
       expect(animatedText.isRunning).toBe(true);
@@ -341,7 +341,7 @@ describe('Responsive Behavior and Resize Handling', () => {
     });
 
     test('should handle resize errors gracefully', async () => {
-      animatedText = new AnimatedNoiseText(canvas, { text: 'TEST' });
+      animatedText = new NoSnap(canvas, { text: 'TEST' });
       animatedText.start();
       
       // Mock an error in text mask generation
@@ -387,7 +387,7 @@ describe('Responsive Behavior and Resize Handling', () => {
 
   describe('Debounced resize handling', () => {
     test('should debounce rapid resize events', () => {
-      animatedText = new AnimatedNoiseText(canvas, { text: 'TEST' });
+      animatedText = new NoSnap(canvas, { text: 'TEST' });
       
       // Test that the CanvasManager has a debounced resize handler
       expect(animatedText.canvasManager.resizeHandler).toBeDefined();
@@ -407,7 +407,7 @@ describe('Responsive Behavior and Resize Handling', () => {
 
   describe('Resource cleanup on resize', () => {
     test('should clean up ResizeObserver on destroy', () => {
-      animatedText = new AnimatedNoiseText(canvas, { text: 'TEST' });
+      animatedText = new NoSnap(canvas, { text: 'TEST' });
       
       const disconnectSpy = jest.spyOn(mockResizeObserver, 'disconnect');
       
@@ -417,7 +417,7 @@ describe('Responsive Behavior and Resize Handling', () => {
     });
 
     test('should remove window resize listeners on destroy', () => {
-      animatedText = new AnimatedNoiseText(canvas, { text: 'TEST' });
+      animatedText = new NoSnap(canvas, { text: 'TEST' });
       
       const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
       
@@ -433,7 +433,7 @@ describe('Responsive Behavior and Resize Handling', () => {
       const originalResizeObserver = global.ResizeObserver;
       delete global.ResizeObserver;
 
-      animatedText = new AnimatedNoiseText(canvas, { text: 'TEST' });
+      animatedText = new NoSnap(canvas, { text: 'TEST' });
       
       // Should have started periodic size checking
       expect(animatedText.canvasManager.sizeCheckInterval).toBeDefined();

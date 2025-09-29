@@ -3,7 +3,7 @@
  * These tests focus on memory leak prevention and proper resource disposal
  */
 
-import AnimatedNoiseText from '../src/index.js';
+import NoSnap from '../src/index.js';
 import AnimationController from '../src/components/AnimationController.js';
 import TextRenderer from '../src/components/TextRenderer.js';
 import NoiseGenerator from '../src/components/NoiseGenerator.js';
@@ -201,7 +201,7 @@ describe('Resource Cleanup and Lifecycle Management', () => {
     let instance;
 
     beforeEach(() => {
-      instance = new AnimatedNoiseText(mockCanvas);
+      instance = new NoSnap(mockCanvas);
     });
 
     afterEach(() => {
@@ -241,7 +241,7 @@ describe('Resource Cleanup and Lifecycle Management', () => {
 
     test('should handle destroy with partial initialization', () => {
       // Create instance but don't initialize resources
-      const partialInstance = new AnimatedNoiseText(mockCanvas);
+      const partialInstance = new NoSnap(mockCanvas);
       
       // Manually set some properties to null to simulate partial initialization
       partialInstance.circleCanvas = null;
@@ -297,7 +297,7 @@ describe('Resource Cleanup and Lifecycle Management', () => {
     let instance;
 
     beforeEach(() => {
-      instance = new AnimatedNoiseText(mockCanvas);
+      instance = new NoSnap(mockCanvas);
     });
 
     afterEach(() => {
@@ -377,7 +377,7 @@ describe('Resource Cleanup and Lifecycle Management', () => {
     let instance;
 
     beforeEach(() => {
-      instance = new AnimatedNoiseText(mockCanvas);
+      instance = new NoSnap(mockCanvas);
     });
 
     afterEach(() => {
@@ -435,7 +435,7 @@ describe('Resource Cleanup and Lifecycle Management', () => {
     let instance;
 
     beforeEach(() => {
-      instance = new AnimatedNoiseText(mockCanvas);
+      instance = new NoSnap(mockCanvas);
     });
 
     afterEach(() => {

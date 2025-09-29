@@ -1,4 +1,4 @@
-# Animated Noise Text Library
+# nosnap.js
 
 A JavaScript library for creating animated noise text effects on HTML5 canvas. Transform your text into dynamic, animated noise patterns with smooth transitions and responsive behavior.
 
@@ -20,7 +20,7 @@ A JavaScript library for creating animated noise text effects on HTML5 canvas. T
 ### NPM
 
 ```bash
-npm install animated-noise-text
+npm install nosnap.js
 ```
 
 ### CDN
@@ -28,23 +28,23 @@ npm install animated-noise-text
 ```html
 <!-- ES Module -->
 <script type="module">
-  import AnimatedNoiseText from 'https://unpkg.com/animated-noise-text/dist/animated-noise-text.esm.js';
+  import NoSnap from 'https://unpkg.com/nosnap.js/dist/nosnap.esm.js';
 </script>
 
 <!-- UMD (Global) -->
-<script src="https://unpkg.com/animated-noise-text/dist/animated-noise-text.umd.min.js"></script>
+<script src="https://unpkg.com/nosnap.js/dist/nosnap.umd.min.js"></script>
 ```
 
 ## Quick Start
 
 ```javascript
-import AnimatedNoiseText from 'animated-noise-text';
+import NoSnap from 'nosnap.js';
 
 // Get your canvas element
 const canvas = document.getElementById('myCanvas');
 
 // Create the animation
-const animation = new AnimatedNoiseText(canvas, {
+const animation = new NoSnap(canvas, {
   text: 'HELLO WORLD',
   cellSize: 2,
   stepMs: 32
@@ -59,7 +59,7 @@ animation.start();
 ### Basic Usage
 
 ```javascript
-const animation = new AnimatedNoiseText(canvas, {
+const animation = new NoSnap(canvas, {
   text: 'BASIC EXAMPLE'
 });
 animation.start();
@@ -68,7 +68,7 @@ animation.start();
 ### Custom Configuration
 
 ```javascript
-const animation = new AnimatedNoiseText(canvas, {
+const animation = new NoSnap(canvas, {
   text: 'CUSTOM STYLE',
   cellSize: 3,
   stepMs: 40,
@@ -107,7 +107,7 @@ window.addEventListener('resize', () => {
 
 ```jsx
 import { useEffect, useRef } from 'react';
-import AnimatedNoiseText from 'animated-noise-text';
+import NoSnap from 'nosnap.js';
 
 function AnimatedText({ text = 'REACT EXAMPLE' }) {
   const canvasRef = useRef(null);
@@ -115,7 +115,7 @@ function AnimatedText({ text = 'REACT EXAMPLE' }) {
 
   useEffect(() => {
     if (canvasRef.current) {
-      animationRef.current = new AnimatedNoiseText(canvasRef.current, {
+      animationRef.current = new NoSnap(canvasRef.current, {
         text,
         cellSize: 2,
         stepMs: 32
@@ -150,7 +150,7 @@ function AnimatedText({ text = 'REACT EXAMPLE' }) {
 
 <script>
 import { ref, onMounted, onUnmounted, watch } from 'vue';
-import AnimatedNoiseText from 'animated-noise-text';
+import NoSnap from 'nosnap.js';
 
 export default {
   props: {
@@ -161,7 +161,7 @@ export default {
     let animation = null;
 
     onMounted(() => {
-      animation = new AnimatedNoiseText(canvasRef.value, {
+      animation = new NoSnap(canvasRef.value, {
         text: props.text,
         cellSize: 2,
         stepMs: 32
@@ -192,7 +192,7 @@ export default {
 ### Constructor
 
 ```javascript
-new AnimatedNoiseText(canvas, options)
+new NoSnap(canvas, options)
 ```
 
 **Parameters:**
@@ -228,7 +228,7 @@ new AnimatedNoiseText(canvas, options)
 ### Mobile-Friendly Settings
 
 ```javascript
-const mobileAnimation = new AnimatedNoiseText(canvas, {
+const mobileAnimation = new NoSnap(canvas, {
   text: 'MOBILE',
   cellSize: 4,        // Larger cells = better performance
   stepMs: 50,         // Slower updates = less CPU usage
@@ -239,7 +239,7 @@ const mobileAnimation = new AnimatedNoiseText(canvas, {
 ### High-Quality Settings
 
 ```javascript
-const qualityAnimation = new AnimatedNoiseText(canvas, {
+const qualityAnimation = new NoSnap(canvas, {
   text: 'QUALITY',
   cellSize: 1,        // Fine detail
   stepMs: 16,         // 60fps animation

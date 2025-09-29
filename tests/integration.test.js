@@ -1,8 +1,8 @@
 /**
- * Integration tests for AnimatedNoiseText with ConfigManager
+ * Integration tests for NoSnap with ConfigManager
  */
 
-import AnimatedNoiseText from '../src/index.js';
+import NoSnap from '../src/index.js';
 
 // Mock canvas and context for testing
 const createMockCanvas = () => {
@@ -113,7 +113,7 @@ afterEach(() => {
   console.warn = originalWarn;
 });
 
-describe('AnimatedNoiseText Integration', () => {
+describe('NoSnap Integration', () => {
   let mockCanvas;
 
   beforeEach(() => {
@@ -122,7 +122,7 @@ describe('AnimatedNoiseText Integration', () => {
 
   describe('constructor with ConfigManager', () => {
     test('should initialize with default configuration', () => {
-      const instance = new AnimatedNoiseText(mockCanvas);
+      const instance = new NoSnap(mockCanvas);
       
       expect(instance.config).toBeDefined();
       expect(instance.config.text).toBe('HELLO');
@@ -138,7 +138,7 @@ describe('AnimatedNoiseText Integration', () => {
         circleRadius: 250
       };
       
-      const instance = new AnimatedNoiseText(mockCanvas, options);
+      const instance = new NoSnap(mockCanvas, options);
       
       expect(instance.config.text).toBe('CUSTOM');
       expect(instance.config.cellSize).toBe(4);
@@ -155,7 +155,7 @@ describe('AnimatedNoiseText Integration', () => {
         circleRadius: 2000 // Invalid - above maximum
       };
       
-      const instance = new AnimatedNoiseText(mockCanvas, options);
+      const instance = new NoSnap(mockCanvas, options);
       
       // Should have sanitized the invalid values
       expect(instance.config.cellSize).toBe(1); // Clamped to minimum
@@ -168,7 +168,7 @@ describe('AnimatedNoiseText Integration', () => {
     });
 
     test('should handle null options gracefully', () => {
-      const instance = new AnimatedNoiseText(mockCanvas, null);
+      const instance = new NoSnap(mockCanvas, null);
       
       expect(instance.config).toEqual({
         text: 'HELLO',
@@ -188,7 +188,7 @@ describe('AnimatedNoiseText Integration', () => {
 
   describe('updateConfig method', () => {
     test('should update configuration correctly', () => {
-      const instance = new AnimatedNoiseText(mockCanvas, { text: 'INITIAL' });
+      const instance = new NoSnap(mockCanvas, { text: 'INITIAL' });
       
       instance.updateConfig({
         text: 'UPDATED',
@@ -202,7 +202,7 @@ describe('AnimatedNoiseText Integration', () => {
     });
 
     test('should handle invalid updates with warnings', () => {
-      const instance = new AnimatedNoiseText(mockCanvas);
+      const instance = new NoSnap(mockCanvas);
       
       instance.updateConfig({
         cellSize: 25, // Invalid - above maximum
@@ -219,7 +219,7 @@ describe('AnimatedNoiseText Integration', () => {
 
   describe('setText method', () => {
     test('should update text configuration', () => {
-      const instance = new AnimatedNoiseText(mockCanvas, { text: 'INITIAL' });
+      const instance = new NoSnap(mockCanvas, { text: 'INITIAL' });
       
       instance.setText('NEW TEXT');
       
@@ -227,7 +227,7 @@ describe('AnimatedNoiseText Integration', () => {
     });
 
     test('should handle empty string', () => {
-      const instance = new AnimatedNoiseText(mockCanvas);
+      const instance = new NoSnap(mockCanvas);
       
       instance.setText('');
       
@@ -250,7 +250,7 @@ describe('AnimatedNoiseText Integration', () => {
         fontFamily: 'Arial'
       };
       
-      const instance = new AnimatedNoiseText(mockCanvas, complexOptions);
+      const instance = new NoSnap(mockCanvas, complexOptions);
       
       expect(instance.config).toEqual(complexOptions);
       expect(warnMessages).toHaveLength(0);
@@ -266,7 +266,7 @@ describe('AnimatedNoiseText Integration', () => {
         fontWeight: 600  // Valid
       };
       
-      const instance = new AnimatedNoiseText(mockCanvas, mixedOptions);
+      const instance = new NoSnap(mockCanvas, mixedOptions);
       
       expect(instance.config.text).toBe('MIXED');
       expect(instance.config.cellSize).toBe(20);    // Sanitized

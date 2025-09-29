@@ -3,7 +3,7 @@
  * Tests Requirements: 6.1, 6.2, 6.3, 6.4
  */
 
-import AnimatedNoiseText from '../src/index.js';
+import NoSnap from '../src/index.js';
 import { createMockCanvas } from './test-utils/canvas-mock.js';
 
 // Mock different browser environments
@@ -144,8 +144,8 @@ describe('Browser Compatibility Tests', () => {
       });
 
       // Test that the library can be imported and basic functionality works
-      expect(AnimatedNoiseText).toBeDefined();
-      expect(typeof AnimatedNoiseText).toBe('function');
+      expect(NoSnap).toBeDefined();
+      expect(typeof NoSnap).toBe('function');
       
       // Test browser environment setup
       expect(window.devicePixelRatio).toBe(2);
@@ -164,8 +164,8 @@ describe('Browser Compatibility Tests', () => {
       });
 
       // Test that the library can be imported and basic functionality works
-      expect(AnimatedNoiseText).toBeDefined();
-      expect(typeof AnimatedNoiseText).toBe('function');
+      expect(NoSnap).toBeDefined();
+      expect(typeof NoSnap).toBe('function');
       
       // Test browser environment setup
       expect(window.devicePixelRatio).toBe(1);
@@ -183,8 +183,8 @@ describe('Browser Compatibility Tests', () => {
       });
 
       // Test that the library can be imported and basic functionality works
-      expect(AnimatedNoiseText).toBeDefined();
-      expect(typeof AnimatedNoiseText).toBe('function');
+      expect(NoSnap).toBeDefined();
+      expect(typeof NoSnap).toBe('function');
       
       // Test browser environment setup
       expect(window.devicePixelRatio).toBe(2);
@@ -201,8 +201,8 @@ describe('Browser Compatibility Tests', () => {
       });
 
       // Test that the library can be imported and basic functionality works
-      expect(AnimatedNoiseText).toBeDefined();
-      expect(typeof AnimatedNoiseText).toBe('function');
+      expect(NoSnap).toBeDefined();
+      expect(typeof NoSnap).toBe('function');
       
       // Test browser environment setup
       expect(window.devicePixelRatio).toBe(1.25);
@@ -218,7 +218,7 @@ describe('Browser Compatibility Tests', () => {
       expect(window.devicePixelRatio).toBe(1);
       
       // Test that the library can handle standard DPI
-      expect(AnimatedNoiseText).toBeDefined();
+      expect(NoSnap).toBeDefined();
     });
 
     test('should handle high-DPI displays (devicePixelRatio = 2)', () => {
@@ -229,7 +229,7 @@ describe('Browser Compatibility Tests', () => {
       expect(window.devicePixelRatio).toBe(2);
       
       // Test that the library can handle high DPI
-      expect(AnimatedNoiseText).toBeDefined();
+      expect(NoSnap).toBeDefined();
     });
 
     test('should handle fractional device pixel ratios', () => {
@@ -240,7 +240,7 @@ describe('Browser Compatibility Tests', () => {
       expect(window.devicePixelRatio).toBe(1.5);
       
       // Test that the library can handle fractional DPI
-      expect(AnimatedNoiseText).toBeDefined();
+      expect(NoSnap).toBeDefined();
     });
 
     test('should handle missing devicePixelRatio', () => {
@@ -254,7 +254,7 @@ describe('Browser Compatibility Tests', () => {
       expect(window.devicePixelRatio === undefined || typeof window.devicePixelRatio === 'number').toBe(true);
       
       // Test that the library can handle missing DPI
-      expect(AnimatedNoiseText).toBeDefined();
+      expect(NoSnap).toBeDefined();
     });
   });
 
@@ -282,7 +282,7 @@ describe('Browser Compatibility Tests', () => {
       expect(window.cancelAnimationFrame).toBeUndefined();
       
       // Library should still be available for fallback handling
-      expect(AnimatedNoiseText).toBeDefined();
+      expect(NoSnap).toBeDefined();
     });
 
     test('should handle performance.now() availability', () => {
@@ -303,7 +303,7 @@ describe('Browser Compatibility Tests', () => {
       expect(global.performance).toBeUndefined();
       
       // Library should still be available for fallback handling
-      expect(AnimatedNoiseText).toBeDefined();
+      expect(NoSnap).toBeDefined();
     });
   });
 
@@ -326,7 +326,7 @@ describe('Browser Compatibility Tests', () => {
       });
 
       // Test that we can detect canvas support issues
-      expect(AnimatedNoiseText).toBeDefined();
+      expect(NoSnap).toBeDefined();
       
       // In a real browser without canvas support, this would fail
       // But in our test environment, we're just testing the detection logic
@@ -384,25 +384,25 @@ describe('Browser Compatibility Tests', () => {
   describe('Module System Compatibility', () => {
     test('should work as ES6 module', () => {
       // Test that the default export is available
-      expect(AnimatedNoiseText).toBeDefined();
-      expect(typeof AnimatedNoiseText).toBe('function');
+      expect(NoSnap).toBeDefined();
+      expect(typeof NoSnap).toBe('function');
       
       // Test that it has the expected prototype
-      expect(AnimatedNoiseText.prototype).toBeDefined();
-      expect(AnimatedNoiseText.prototype.constructor).toBe(AnimatedNoiseText);
+      expect(NoSnap.prototype).toBeDefined();
+      expect(NoSnap.prototype.constructor).toBe(NoSnap);
     });
 
     test('should handle different import patterns', () => {
       // Test default import (already tested above)
-      expect(AnimatedNoiseText).toBeDefined();
+      expect(NoSnap).toBeDefined();
       
       // Test that the constructor signature is correct
-      expect(AnimatedNoiseText.length).toBeGreaterThanOrEqual(1); // At least one parameter (canvas)
+      expect(NoSnap.length).toBeGreaterThanOrEqual(1); // At least one parameter (canvas)
       
       // Test that it's a proper constructor function
-      expect(AnimatedNoiseText.prototype.start).toBeDefined();
-      expect(AnimatedNoiseText.prototype.stop).toBeDefined();
-      expect(AnimatedNoiseText.prototype.destroy).toBeDefined();
+      expect(NoSnap.prototype.start).toBeDefined();
+      expect(NoSnap.prototype.stop).toBeDefined();
+      expect(NoSnap.prototype.destroy).toBeDefined();
     });
   });
 
@@ -426,7 +426,7 @@ describe('Browser Compatibility Tests', () => {
       expect(global.ResizeObserver).toBeUndefined();
       
       // Library should still be available
-      expect(AnimatedNoiseText).toBeDefined();
+      expect(NoSnap).toBeDefined();
     });
 
     test('should maintain core functionality with limited browser support', () => {
@@ -451,8 +451,8 @@ describe('Browser Compatibility Tests', () => {
       expect(global.ResizeObserver).toBeUndefined();
       
       // Core library should still be available
-      expect(AnimatedNoiseText).toBeDefined();
-      expect(typeof AnimatedNoiseText).toBe('function');
+      expect(NoSnap).toBeDefined();
+      expect(typeof NoSnap).toBe('function');
     });
 
     test('should handle browser-specific quirks', () => {
@@ -484,7 +484,7 @@ describe('Browser Compatibility Tests', () => {
         }
         
         // Library should be available regardless of browser quirks
-        expect(AnimatedNoiseText).toBeDefined();
+        expect(NoSnap).toBeDefined();
       });
     });
   });
@@ -492,8 +492,8 @@ describe('Browser Compatibility Tests', () => {
   describe('Feature Detection', () => {
     test('should detect and adapt to available browser features', () => {
       // Test that the library has the necessary structure for feature detection
-      expect(AnimatedNoiseText).toBeDefined();
-      expect(AnimatedNoiseText.prototype).toBeDefined();
+      expect(NoSnap).toBeDefined();
+      expect(NoSnap.prototype).toBeDefined();
       
       // Test basic browser feature detection
       const hasCanvas = typeof document.createElement === 'function';
@@ -506,8 +506,8 @@ describe('Browser Compatibility Tests', () => {
 
     test('should provide browser compatibility information', () => {
       // Test that the library can be imported and has the expected structure
-      expect(AnimatedNoiseText).toBeDefined();
-      expect(typeof AnimatedNoiseText).toBe('function');
+      expect(NoSnap).toBeDefined();
+      expect(typeof NoSnap).toBe('function');
       
       // Test that basic browser APIs are available in test environment
       expect(typeof window).toBe('object');

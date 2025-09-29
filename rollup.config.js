@@ -8,7 +8,7 @@ export default [
   {
     input: 'src/index.js',
     output: {
-      file: 'dist/animated-noise-text.esm.js',
+      file: 'dist/nosnap.esm.js',
       format: 'es',
       sourcemap: true,
       exports: 'named'
@@ -22,7 +22,7 @@ export default [
   {
     input: 'src/index.js',
     output: {
-      file: 'dist/animated-noise-text.cjs.js',
+      file: 'dist/nosnap.cjs.js',
       format: 'cjs',
       sourcemap: true,
       exports: 'named'
@@ -36,9 +36,9 @@ export default [
   {
     input: 'src/index.js',
     output: {
-      file: 'dist/animated-noise-text.umd.js',
+      file: 'dist/nosnap.umd.js',
       format: 'umd',
-      name: 'AnimatedNoiseText',
+      name: 'NoSnap',
       sourcemap: true,
       exports: 'named'
     },
@@ -51,9 +51,9 @@ export default [
   {
     input: 'src/index.js',
     output: {
-      file: 'dist/animated-noise-text.umd.min.js',
+      file: 'dist/nosnap.umd.min.js',
       format: 'umd',
-      name: 'AnimatedNoiseText',
+      name: 'NoSnap',
       sourcemap: true,
       exports: 'named'
     },
@@ -65,7 +65,7 @@ export default [
           drop_debugger: true
         },
         mangle: {
-          reserved: ['AnimatedNoiseText']
+          reserved: ['NoSnap']
         }
       })
     ]

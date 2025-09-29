@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import AnimatedNoiseText from 'animated-noise-text';
+import NoSnap from 'nosnap.js';
 
 /**
- * React Hook for Animated Noise Text
+ * React Hook for NoSnap
  * Provides a clean React interface for the library
  */
-export function useAnimatedNoiseText(options = {}) {
+export function useNoSnap(options = {}) {
   const canvasRef = useRef(null);
   const animationRef = useRef(null);
   const [isRunning, setIsRunning] = useState(false);
@@ -16,11 +16,11 @@ export function useAnimatedNoiseText(options = {}) {
     if (!canvasRef.current) return;
 
     try {
-      animationRef.current = new AnimatedNoiseText(canvasRef.current, options);
+      animationRef.current = new NoSnap(canvasRef.current, options);
       setError(null);
     } catch (err) {
       setError(err.message);
-      console.error('Failed to initialize AnimatedNoiseText:', err);
+      console.error('Failed to initialize NoSnap:', err);
     }
 
     // Cleanup on unmount
@@ -107,10 +107,10 @@ export function useAnimatedNoiseText(options = {}) {
 }
 
 /**
- * React Component for Animated Noise Text
+ * React Component for NoSnap
  * Simple component wrapper for the library
  */
-export function AnimatedNoiseTextComponent({ 
+export function NoSnapComponent({ 
   text = 'HELLO REACT',
   autoStart = true,
   className = '',
@@ -126,7 +126,7 @@ export function AnimatedNoiseTextComponent({
     stop,
     setText,
     updateConfig
-  } = useAnimatedNoiseText({ text, ...options });
+  } = useNoSnap({ text, ...options });
 
   // Auto-start animation if requested
   useEffect(() => {
@@ -169,7 +169,7 @@ export function BasicExample() {
   return (
     <div style={{ padding: '20px' }}>
       <h2>Basic React Example</h2>
-      <AnimatedNoiseTextComponent
+      <NoSnapComponent
         text="REACT BASIC"
         cellSize={2}
         stepMs={32}
@@ -194,7 +194,7 @@ export function InteractiveExample() {
     start,
     stop,
     updateConfig
-  } = useAnimatedNoiseText({
+  } = useNoSnap({
     text,
     cellSize,
     stepMs,
@@ -324,7 +324,7 @@ export function ResponsiveExample() {
     isRunning,
     start,
     stop
-  } = useAnimatedNoiseText({
+  } = useNoSnap({
     text: 'RESPONSIVE',
     cellSize: 2,
     stepMs: 32,
@@ -398,7 +398,7 @@ export function MultipleAnimationsExample() {
         {animations.map((config, index) => (
           <div key={index} style={{ textAlign: 'center' }}>
             <h3>Animation {index + 1}</h3>
-            <AnimatedNoiseTextComponent
+            <NoSnapComponent
               {...config}
               style={{ width: '100%', height: '200px' }}
               autoStart={true}
@@ -429,7 +429,7 @@ export default function App() {
   return (
     <div style={{ fontFamily: 'Arial, sans-serif' }}>
       <header style={{ padding: '20px', background: '#f5f5f5', borderBottom: '1px solid #ddd' }}>
-        <h1>Animated Noise Text - React Examples</h1>
+        <h1>nosnap.js - React Examples</h1>
         
         <nav style={{ marginTop: '20px' }}>
           {Object.keys(examples).map(key => (

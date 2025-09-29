@@ -1,17 +1,17 @@
 {
-  "name": "animated-noise-text",
+  "name": "nosnap.js",
   "version": "1.0.0",
   "description": "A JavaScript library for creating animated noise text effects on HTML5 canvas",
-  "main": "dist/animated-noise-text.cjs.js",
-  "module": "dist/animated-noise-text.esm.js",
-  "browser": "dist/animated-noise-text.umd.js",
-  "types": "dist/animated-noise-text.d.ts",
+  "main": "dist/nosnap.cjs.js",
+  "module": "dist/nosnap.esm.js",
+  "browser": "dist/nosnap.umd.js",
+  "types": "dist/nosnap.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/animated-noise-text.esm.js",
-      "require": "./dist/animated-noise-text.cjs.js",
-      "browser": "./dist/animated-noise-text.umd.js",
-      "types": "./dist/animated-noise-text.d.ts"
+      "import": "./dist/nosnap.esm.js",
+      "require": "./dist/nosnap.cjs.js",
+      "browser": "./dist/nosnap.umd.js",
+      "types": "./dist/nosnap.d.ts"
     }
   },
   "files": [
@@ -39,7 +39,7 @@
     "test:coverage": "jest --coverage --verbose",
     "test:ci": "jest --coverage --ci --watchAll=false --maxWorkers=2",
     "lint": "eslint src/**/*.js",
-    "clean": "rimraf dist/*.js dist/*.map",
+    "clean": "rimraf dist/*",
     "prepublishOnly": "npm run clean && npm run build",
     "size": "npm run build:prod && bundlesize"
   },

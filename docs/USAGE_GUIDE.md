@@ -1,6 +1,6 @@
 # Usage Guide - Common Configuration Scenarios
 
-This guide provides practical examples for common use cases and configuration scenarios with the Animated Noise Text library.
+This guide provides practical examples for common use cases and configuration scenarios with nosnap.js.
 
 ## Table of Contents
 
@@ -19,10 +19,10 @@ This guide provides practical examples for common use cases and configuration sc
 Perfect for basic text effects with minimal configuration:
 
 ```javascript
-import AnimatedNoiseText from 'animated-noise-text';
+import NoSnap from 'nosnap.js';
 
 const canvas = document.getElementById('canvas');
-const animation = new AnimatedNoiseText(canvas, {
+const animation = new NoSnap(canvas, {
   text: 'HELLO WORLD'
 });
 
@@ -34,7 +34,7 @@ animation.start();
 Let the library automatically calculate the optimal font size:
 
 ```javascript
-const animation = new AnimatedNoiseText(canvas, {
+const animation = new NoSnap(canvas, {
   text: 'AUTO SIZE',
   fontSize: null, // Auto-calculated based on canvas size
   fontWeight: 900
@@ -46,7 +46,7 @@ const animation = new AnimatedNoiseText(canvas, {
 Use custom fonts and styling:
 
 ```javascript
-const animation = new AnimatedNoiseText(canvas, {
+const animation = new NoSnap(canvas, {
   text: 'CUSTOM FONT',
   fontFamily: 'Arial Black, sans-serif',
   fontWeight: 'bold',
@@ -61,7 +61,7 @@ const animation = new AnimatedNoiseText(canvas, {
 Configuration for large, bold display text:
 
 ```javascript
-const displayAnimation = new AnimatedNoiseText(canvas, {
+const displayAnimation = new NoSnap(canvas, {
   text: 'DISPLAY',
   fontSize: 72,
   fontWeight: 900,
@@ -76,7 +76,7 @@ const displayAnimation = new AnimatedNoiseText(canvas, {
 Subtle animation for background text effects:
 
 ```javascript
-const subtleAnimation = new AnimatedNoiseText(canvas, {
+const subtleAnimation = new NoSnap(canvas, {
   text: 'BACKGROUND',
   cellSize: 4,
   stepMs: 60,
@@ -91,7 +91,7 @@ const subtleAnimation = new AnimatedNoiseText(canvas, {
 Achieve a retro, pixelated aesthetic:
 
 ```javascript
-const retroAnimation = new AnimatedNoiseText(canvas, {
+const retroAnimation = new NoSnap(canvas, {
   text: 'RETRO',
   cellSize: 6,
   maskBlockSize: 6,
@@ -107,7 +107,7 @@ const retroAnimation = new AnimatedNoiseText(canvas, {
 Clean, modern animation with smooth movement:
 
 ```javascript
-const modernAnimation = new AnimatedNoiseText(canvas, {
+const modernAnimation = new NoSnap(canvas, {
   text: 'MODERN',
   cellSize: 1,
   maskBlockSize: 1,
@@ -125,7 +125,7 @@ const modernAnimation = new AnimatedNoiseText(canvas, {
 Optimized for mobile devices and lower-end hardware:
 
 ```javascript
-const mobileAnimation = new AnimatedNoiseText(canvas, {
+const mobileAnimation = new NoSnap(canvas, {
   text: 'MOBILE',
   cellSize: 4,        // Larger cells = better performance
   stepMs: 50,         // Slower updates = less CPU usage
@@ -139,7 +139,7 @@ const mobileAnimation = new AnimatedNoiseText(canvas, {
 For desktop applications where quality is prioritized:
 
 ```javascript
-const qualityAnimation = new AnimatedNoiseText(canvas, {
+const qualityAnimation = new NoSnap(canvas, {
   text: 'QUALITY',
   cellSize: 1,        // Fine detail
   stepMs: 16,         // 60fps animation
@@ -153,7 +153,7 @@ const qualityAnimation = new AnimatedNoiseText(canvas, {
 Good balance between quality and performance:
 
 ```javascript
-const balancedAnimation = new AnimatedNoiseText(canvas, {
+const balancedAnimation = new NoSnap(canvas, {
   text: 'BALANCED',
   cellSize: 2,
   stepMs: 32,         // ~30fps
@@ -167,7 +167,7 @@ const balancedAnimation = new AnimatedNoiseText(canvas, {
 Slow, dramatic animation for emphasis:
 
 ```javascript
-const dramaticAnimation = new AnimatedNoiseText(canvas, {
+const dramaticAnimation = new NoSnap(canvas, {
   text: 'DRAMATIC',
   cellSize: 2,
   stepMs: 100,        // Very slow updates
@@ -200,7 +200,7 @@ function resizeCanvas() {
 resizeCanvas();
 
 // Create animation (it will automatically handle resize events)
-const animation = new AnimatedNoiseText(canvas, {
+const animation = new NoSnap(canvas, {
   text: 'RESPONSIVE',
   fontSize: null // Auto-calculate based on canvas size
 });
@@ -249,7 +249,7 @@ function getConfigForScreenSize() {
   }
 }
 
-const animation = new AnimatedNoiseText(canvas, getConfigForScreenSize());
+const animation = new NoSnap(canvas, getConfigForScreenSize());
 ```
 
 ## Interactive Examples
@@ -259,7 +259,7 @@ const animation = new AnimatedNoiseText(canvas, getConfigForScreenSize());
 Allow users to change the text dynamically:
 
 ```javascript
-const animation = new AnimatedNoiseText(canvas, {
+const animation = new NoSnap(canvas, {
   text: 'TYPE HERE'
 });
 
@@ -277,7 +277,7 @@ animation.start();
 Provide user controls for animation:
 
 ```javascript
-const animation = new AnimatedNoiseText(canvas, {
+const animation = new NoSnap(canvas, {
   text: 'CONTROLS'
 });
 
@@ -332,7 +332,7 @@ const themes = {
   }
 };
 
-const animation = new AnimatedNoiseText(canvas, {
+const animation = new NoSnap(canvas, {
   text: 'THEME DEMO',
   ...themes.modern
 });
@@ -354,7 +354,7 @@ document.getElementById('dramaticBtn').addEventListener('click', () => switchThe
 Handle multi-line text with line breaks:
 
 ```javascript
-const multilineAnimation = new AnimatedNoiseText(canvas, {
+const multilineAnimation = new NoSnap(canvas, {
   text: 'MULTI\nLINE\nTEXT',
   fontSize: 36,
   fontWeight: 'bold'
@@ -366,7 +366,7 @@ const multilineAnimation = new AnimatedNoiseText(canvas, {
 Support for Unicode characters and emojis:
 
 ```javascript
-const unicodeAnimation = new AnimatedNoiseText(canvas, {
+const unicodeAnimation = new NoSnap(canvas, {
   text: '🌟 UNICODE 🌟',
   fontSize: 40,
   fontFamily: 'Arial, sans-serif'
@@ -381,7 +381,7 @@ Automatically cycle through different text values:
 const texts = ['FIRST', 'SECOND', 'THIRD', 'FOURTH'];
 let currentIndex = 0;
 
-const cyclingAnimation = new AnimatedNoiseText(canvas, {
+const cyclingAnimation = new NoSnap(canvas, {
   text: texts[0],
   cellSize: 2,
   stepMs: 32
@@ -404,7 +404,7 @@ Monitor and adjust performance dynamically:
 let frameCount = 0;
 let lastTime = Date.now();
 
-const monitoredAnimation = new AnimatedNoiseText(canvas, {
+const monitoredAnimation = new NoSnap(canvas, {
   text: 'MONITORED',
   cellSize: 2,
   stepMs: 32

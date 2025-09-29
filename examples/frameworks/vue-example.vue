@@ -2,7 +2,7 @@
   <div class="animated-noise-text-app">
     <!-- Header -->
     <header class="header">
-      <h1>Animated Noise Text - Vue.js Examples</h1>
+      <h1>nosnap.js - Vue.js Examples</h1>
       <nav class="nav">
         <button
           v-for="example in examples"
@@ -27,10 +27,10 @@
 
 <script>
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue';
-import AnimatedNoiseText from 'animated-noise-text';
+import NoSnap from 'nosnap.js';
 
-// Composable for Animated Noise Text
-export function useAnimatedNoiseText(canvasRef, options = {}) {
+// Composable for NoSnap
+export function useNoSnap(canvasRef, options = {}) {
   const animation = ref(null);
   const isRunning = ref(false);
   const error = ref(null);
@@ -39,11 +39,11 @@ export function useAnimatedNoiseText(canvasRef, options = {}) {
     if (!canvasRef.value) return;
 
     try {
-      animation.value = new AnimatedNoiseText(canvasRef.value, options.value || options);
+      animation.value = new NoSnap(canvasRef.value, options.value || options);
       error.value = null;
     } catch (err) {
       error.value = err.message;
-      console.error('Failed to initialize AnimatedNoiseText:', err);
+      console.error('Failed to initialize NoSnap:', err);
     }
   };
 
@@ -122,7 +122,7 @@ export function useAnimatedNoiseText(canvasRef, options = {}) {
 const BasicExample = {
   setup() {
     const canvasRef = ref(null);
-    const { initialize, start, error } = useAnimatedNoiseText(canvasRef, {
+    const { initialize, start, error } = useNoSnap(canvasRef, {
       text: 'VUE BASIC',
       cellSize: 2,
       stepMs: 32
@@ -177,7 +177,7 @@ const InteractiveExample = {
       stop,
       setText,
       updateConfig
-    } = useAnimatedNoiseText(canvasRef, options);
+    } = useNoSnap(canvasRef, options);
 
     // Watch for text changes
     watch(text, (newText) => {
@@ -293,7 +293,7 @@ const ResponsiveExample = {
       start,
       stop,
       destroy
-    } = useAnimatedNoiseText(canvasRef, {
+    } = useNoSnap(canvasRef, {
       text: 'RESPONSIVE',
       cellSize: 2,
       stepMs: 32,
@@ -374,7 +374,7 @@ const MultipleAnimationsExample = {
       props: ['config', 'index'],
       setup(props) {
         const canvasRef = ref(null);
-        const { initialize, start, destroy } = useAnimatedNoiseText(canvasRef, props.config);
+        const { initialize, start, destroy } = useNoSnap(canvasRef, props.config);
 
         onMounted(async () => {
           await nextTick();

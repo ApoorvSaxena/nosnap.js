@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nosnap.js Build Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        canvas {
+            border: 2px solid #333;
+            background: #000;
+            display: block;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>nosnap.js Build Test</h1>
+        <p>Testing the renamed library build...</p>
+        
+        <canvas id="canvas" width="600" height="300"></canvas>
+        
+        <div class="controls">
+            <button id="startBtn">Start Animation</button>
+            <button id="stopBtn">Stop Animation</button>
+            <button id="changeTextBtn">Change Text</button>
+        </div>
+        
+        <div id="status">Ready to test...</div>
+    </div>
+
+    <script type="module">
+        import NoSnap from './dist/nosnap.esm.js';
+
+        const canvas = document.getElementById('canvas');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const changeTextBtn = document.getElementById('changeTextBtn');
+        const status = document.getElementById('status');
+
+        let animation;
+        let textIndex = 0;
+        const texts = ['NOSNAP.JS', 'RENAMED!', 'SUCCESS!', 'WORKING!'];
+
+        try {
+            animation = new NoSnap(canvas, {
+                text: 'NOSNAP.JS',
+                cellSize: 2,
+                stepMs: 32,
+                fontWeight: 900
+            });
+            
+            status.textContent = 'NoSnap instance created successfully!';
+            status.style.color = 'green';
+        } catch (error) {
+            status.textContent = `Error: ${error.message}`;
+            status.style.color = 'red';
+        }
+
+        startBtn.addEventListener('click', () => {
+            try {
+                animation.start();
+                status.textContent = 'Animation started!';
+                status.style.color = 'green';
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+            } catch (error) {
+                status.textContent = `Start error: ${error.message}`;
+                status.style.color = 'red';
+            }
+        });
+
+        stopBtn.addEventListener('click', () => {
+            try {
+                animation.stop();
+                status.textContent = 'Animation stopped!';
+                status.style.color = 'orange';
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+            } catch (error) {
+                status.textContent = `Stop error: ${error.message}`;
+                status.style.color = 'red';
+            }
+        });
+
+        changeTextBtn.addEventListener('click', () => {
+            try {
+                textIndex = (textIndex + 1) % texts.length;
+                animation.setText(texts[textIndex]);
+                status.textContent = `Text changed to: ${texts[textIndex]}`;
+                status.style.color = 'blue';
+            } catch (error) {
+                status.textContent = `Text change error: ${error.message}`;
+                status.style.color = 'red';
+            }
+        });
+
+        // Initial state
+        stopBtn.disabled = true;
+    </script>
+</body>
+</html>

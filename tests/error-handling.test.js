@@ -1,9 +1,9 @@
 /**
  * Comprehensive Error Handling Tests
- * Tests for all error handling scenarios in the AnimatedNoiseText library
+ * Tests for all error handling scenarios in the NoSnap library
  */
 
-import AnimatedNoiseText from '../src/index.js';
+import NoSnap from '../src/index.js';
 import CanvasManager from '../src/components/CanvasManager.js';
 import NoiseGenerator from '../src/components/NoiseGenerator.js';
 import TextRenderer from '../src/components/TextRenderer.js';
@@ -26,38 +26,38 @@ afterAll(() => {
   document.createElement = originalCreateElement;
 });
 
-describe('AnimatedNoiseText Constructor Error Handling', () => {
+describe('NoSnap Constructor Error Handling', () => {
   test('should throw error for null canvas', () => {
     expect(() => {
-      new AnimatedNoiseText(null);
-    }).toThrow('AnimatedNoiseText constructor requires a canvas element as the first parameter. Received: null');
+      new NoSnap(null);
+    }).toThrow('NoSnap constructor requires a canvas element as the first parameter. Received: null');
   });
 
   test('should throw error for undefined canvas', () => {
     expect(() => {
-      new AnimatedNoiseText(undefined);
-    }).toThrow('AnimatedNoiseText constructor requires a canvas element as the first parameter. Received: undefined');
+      new NoSnap(undefined);
+    }).toThrow('NoSnap constructor requires a canvas element as the first parameter. Received: undefined');
   });
 
   test('should throw error for non-canvas element', () => {
     const div = document.createElement('div');
     expect(() => {
-      new AnimatedNoiseText(div);
-    }).toThrow(/AnimatedNoiseText requires an HTMLCanvasElement. Received: HTMLDivElement/);
+      new NoSnap(div);
+    }).toThrow(/NoSnap requires an HTMLCanvasElement. Received: HTMLDivElement/);
   });
 
   test('should throw error for invalid options type', () => {
     const canvas = createMockCanvas();
     expect(() => {
-      new AnimatedNoiseText(canvas, 'invalid');
-    }).toThrow(/AnimatedNoiseText options must be an object or undefined. Received: string/);
+      new NoSnap(canvas, 'invalid');
+    }).toThrow(/NoSnap options must be an object or undefined. Received: string/);
   });
 
   test('should handle canvas context failure', () => {
     const canvas = createFailingMockCanvas();
     
     expect(() => {
-      new AnimatedNoiseText(canvas);
+      new NoSnap(canvas);
     }).toThrow(/Canvas context validation failed.*Failed to get 2D rendering context/);
   });
 
@@ -67,7 +67,7 @@ describe('AnimatedNoiseText Constructor Error Handling', () => {
     
     const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
     
-    new AnimatedNoiseText(canvas);
+    new NoSnap(canvas);
     
     expect(consoleSpy).toHaveBeenCalledWith(
       expect.stringContaining('Canvas element is not attached to the DOM')
@@ -80,17 +80,17 @@ describe('AnimatedNoiseText Constructor Error Handling', () => {
     const canvas = createMockCanvas({ width: 0, height: 0 });
     
     expect(() => {
-      new AnimatedNoiseText(canvas);
+      new NoSnap(canvas);
     }).toThrow('Invalid canvas dimensions: 0x0');
   });
 });
 
-describe('AnimatedNoiseText Runtime Error Handling', () => {
+describe('NoSnap Runtime Error Handling', () => {
   let canvas, instance;
 
   beforeEach(() => {
     canvas = createMockCanvas();
-    instance = new AnimatedNoiseText(canvas);
+    instance = new NoSnap(canvas);
   });
 
   afterEach(() => {
@@ -462,7 +462,7 @@ describe('Error Recovery Mechanisms', () => {
 
   beforeEach(() => {
     canvas = createMockCanvas();
-    instance = new AnimatedNoiseText(canvas);
+    instance = new NoSnap(canvas);
   });
 
   afterEach(() => {
@@ -524,7 +524,7 @@ describe('Error Recovery Mechanisms', () => {
 describe('Memory Management and Cleanup', () => {
   test('should clean up resources properly on destroy', () => {
     const canvas = createMockCanvas();
-    const instance = new AnimatedNoiseText(canvas);
+    const instance = new NoSnap(canvas);
     
     // Verify resources are created
     expect(instance.canvasManager).toBeDefined();
@@ -544,7 +544,7 @@ describe('Memory Management and Cleanup', () => {
 
   test('should handle cleanup errors gracefully', () => {
     const canvas = createMockCanvas();
-    const instance = new AnimatedNoiseText(canvas);
+    const instance = new NoSnap(canvas);
     
     // Mock component cleanup to throw error
     instance.canvasManager.cleanup = () => {

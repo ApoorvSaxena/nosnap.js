@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animated Noise Text - Vanilla JavaScript Examples</title>
+    <title>nosnap.js - Vanilla JavaScript Examples</title>
     <style>
         * {
             margin: 0;
@@ -240,7 +240,7 @@
 </head>
 <body>
     <header class="header">
-        <h1>Animated Noise Text - Vanilla JavaScript Examples</h1>
+        <h1>nosnap.js - Vanilla JavaScript Examples</h1>
         <nav class="nav">
             <button class="nav-button active" data-example="basic">Basic Usage</button>
             <button class="nav-button" data-example="interactive">Interactive Controls</button>
@@ -488,7 +488,7 @@
 
     <!-- Load the library -->
     <script type="module">
-        import AnimatedNoiseText from '../src/index.js';
+        import NoSnap from '../src/index.js';
 
         // Global state
         let currentExample = 'basic';
@@ -560,7 +560,7 @@
             const status = document.getElementById('basic-status');
 
             try {
-                animations.basic = new AnimatedNoiseText(canvas, {
+                animations.basic = new NoSnap(canvas, {
                     text: 'HELLO WORLD',
                     cellSize: 2,
                     stepMs: 32
@@ -623,7 +623,7 @@
             const fontSizeValue = document.getElementById('font-size-value');
 
             try {
-                animations.interactive = new AnimatedNoiseText(canvas, {
+                animations.interactive = new NoSnap(canvas, {
                     text: textInput.value,
                     cellSize: parseInt(cellSizeSlider.value),
                     stepMs: parseInt(speedSlider.value),
@@ -732,7 +732,7 @@
             try {
                 updateCanvasSize();
 
-                animations.responsive = new AnimatedNoiseText(canvas, {
+                animations.responsive = new NoSnap(canvas, {
                     text: 'RESPONSIVE',
                     cellSize: 2,
                     stepMs: 32,
@@ -792,7 +792,7 @@
                     canvas.width = 280;
                     canvas.height = 200;
 
-                    animations[`multi${index}`] = new AnimatedNoiseText(canvas, {
+                    animations[`multi${index}`] = new NoSnap(canvas, {
                         text: config.text,
                         cellSize: config.cellSize,
                         stepMs: config.stepMs,
@@ -871,7 +871,7 @@
             };
 
             try {
-                animations.performance = new AnimatedNoiseText(canvas, {
+                animations.performance = new NoSnap(canvas, {
                     text: 'PERFORMANCE',
                     ...qualityPresets.balanced
                 });
@@ -1012,7 +1012,7 @@
             };
 
             try {
-                animations.themes = new AnimatedNoiseText(canvas, {
+                animations.themes = new NoSnap(canvas, {
                     text: 'THEMES',
                     ...themes.modern
                 });

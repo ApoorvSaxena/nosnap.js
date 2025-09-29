@@ -1,4 +1,4 @@
-# Animated Noise Text Library - API Documentation
+# nosnap.js - API Documentation
 
 ## Table of Contents
 
@@ -17,7 +17,7 @@
 ### NPM
 
 ```bash
-npm install animated-noise-text
+npm install nosnap.js
 ```
 
 ### CDN
@@ -25,23 +25,23 @@ npm install animated-noise-text
 ```html
 <!-- ES Module -->
 <script type="module">
-  import AnimatedNoiseText from 'https://unpkg.com/animated-noise-text/dist/animated-noise-text.esm.js';
+  import NoSnap from 'https://unpkg.com/nosnap.js/dist/nosnap.esm.js';
 </script>
 
 <!-- UMD (Global) -->
-<script src="https://unpkg.com/animated-noise-text/dist/animated-noise-text.umd.min.js"></script>
+<script src="https://unpkg.com/nosnap.js/dist/nosnap.umd.min.js"></script>
 ```
 
 ## Quick Start
 
 ```javascript
-import AnimatedNoiseText from 'animated-noise-text';
+import NoSnap from 'nosnap.js';
 
 // Get your canvas element
 const canvas = document.getElementById('myCanvas');
 
 // Create the animation
-const animation = new AnimatedNoiseText(canvas, {
+const animation = new NoSnap(canvas, {
   text: 'HELLO WORLD',
   cellSize: 2,
   stepMs: 32
@@ -56,7 +56,7 @@ animation.start();
 ### Constructor
 
 ```javascript
-new AnimatedNoiseText(canvas, options)
+new NoSnap(canvas, options)
 ```
 
 Creates a new animated noise text instance.
@@ -66,7 +66,7 @@ Creates a new animated noise text instance.
 - `canvas` (HTMLCanvasElement) - **Required.** The target canvas element where the animation will be rendered.
 - `options` (Object) - **Optional.** Configuration options for the animation. See [Configuration Options](#configuration-options) for details.
 
-**Returns:** AnimatedNoiseText instance
+**Returns:** NoSnap instance
 
 **Throws:**
 - `Error` - If canvas is not a valid HTMLCanvasElement
@@ -77,7 +77,7 @@ Creates a new animated noise text instance.
 
 ```javascript
 const canvas = document.getElementById('myCanvas');
-const animation = new AnimatedNoiseText(canvas, {
+const animation = new NoSnap(canvas, {
   text: 'ANIMATED TEXT',
   cellSize: 3,
   stepMs: 40
@@ -104,12 +104,12 @@ All configuration options are optional and have sensible defaults.
 
 ```javascript
 // Minimal configuration
-const animation = new AnimatedNoiseText(canvas, {
+const animation = new NoSnap(canvas, {
   text: 'MINIMAL'
 });
 
 // Custom styling
-const animation = new AnimatedNoiseText(canvas, {
+const animation = new NoSnap(canvas, {
   text: 'CUSTOM STYLE',
   fontSize: 48,
   fontWeight: 'bold',
@@ -117,7 +117,7 @@ const animation = new AnimatedNoiseText(canvas, {
 });
 
 // Performance optimized
-const animation = new AnimatedNoiseText(canvas, {
+const animation = new NoSnap(canvas, {
   text: 'FAST',
   cellSize: 4,
   stepMs: 50,
@@ -125,7 +125,7 @@ const animation = new AnimatedNoiseText(canvas, {
 });
 
 // High quality
-const animation = new AnimatedNoiseText(canvas, {
+const animation = new NoSnap(canvas, {
   text: 'HIGH QUALITY',
   cellSize: 1,
   stepMs: 16,
@@ -245,7 +245,7 @@ The library includes comprehensive error handling with graceful fallbacks:
 
 ```javascript
 try {
-  const animation = new AnimatedNoiseText(canvas, options);
+  const animation = new NoSnap(canvas, options);
 } catch (error) {
   console.error('Failed to initialize:', error.message);
   // Handle initialization failure
@@ -318,21 +318,21 @@ For older browser support, include these polyfills:
 
 ```javascript
 // High performance (lower quality)
-const fastAnimation = new AnimatedNoiseText(canvas, {
+const fastAnimation = new NoSnap(canvas, {
   cellSize: 4,
   stepMs: 50,
   maskBlockSize: 4
 });
 
 // Balanced performance
-const balancedAnimation = new AnimatedNoiseText(canvas, {
+const balancedAnimation = new NoSnap(canvas, {
   cellSize: 2,
   stepMs: 32,
   maskBlockSize: 2
 });
 
 // High quality (lower performance)
-const qualityAnimation = new AnimatedNoiseText(canvas, {
+const qualityAnimation = new NoSnap(canvas, {
   cellSize: 1,
   stepMs: 16,
   maskBlockSize: 1
@@ -360,16 +360,16 @@ The library automatically:
 The library includes TypeScript declarations:
 
 ```typescript
-import AnimatedNoiseText, { AnimatedNoiseTextConfig } from 'animated-noise-text';
+import NoSnap, { NoSnapConfig } from 'nosnap.js';
 
-const config: AnimatedNoiseTextConfig = {
+const config: NoSnapConfig = {
   text: 'TYPESCRIPT',
   cellSize: 2,
   stepMs: 32
 };
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-const animation = new AnimatedNoiseText(canvas, config);
+const animation = new NoSnap(canvas, config);
 ```
 
 ## Debugging
@@ -378,7 +378,7 @@ Enable debug mode for development:
 
 ```javascript
 // Enable console warnings and error details
-const animation = new AnimatedNoiseText(canvas, options);
+const animation = new NoSnap(canvas, options);
 
 // Check for initialization errors
 if (animation.initializationErrors?.length > 0) {
