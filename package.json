@@ -2,22 +2,35 @@
   "name": "animated-noise-text",
   "version": "1.0.0",
   "description": "A JavaScript library for creating animated noise text effects on HTML5 canvas",
-  "main": "dist/animated-noise-text.js",
+  "main": "dist/animated-noise-text.cjs.js",
   "module": "dist/animated-noise-text.esm.js",
+  "browser": "dist/animated-noise-text.umd.js",
   "types": "dist/animated-noise-text.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/animated-noise-text.esm.js",
+      "require": "./dist/animated-noise-text.cjs.js",
+      "browser": "./dist/animated-noise-text.umd.js",
+      "types": "./dist/animated-noise-text.d.ts"
+    }
+  },
   "files": [
     "dist/",
     "src/",
     "README.md"
   ],
   "scripts": {
-    "build": "rollup -c",
-    "build:dev": "rollup -c --watch",
+    "build": "npm run clean && npm run build:types && npm run build:dev && npm run build:prod",
+    "build:dev": "rollup -c",
+    "build:prod": "NODE_ENV=production rollup -c",
+    "build:types": "node -e \"console.log('TypeScript declarations preserved')\"",
+    "build:watch": "rollup -c --watch",
     "test": "jest",
     "test:watch": "jest --watch",
     "lint": "eslint src/**/*.js",
-    "clean": "rimraf dist",
-    "prepublishOnly": "npm run clean && npm run build"
+    "clean": "rimraf dist/*.js dist/*.map",
+    "prepublishOnly": "npm run clean && npm run build",
+    "size": "npm run build:prod && bundlesize"
   },
   "keywords": [
     "animation",

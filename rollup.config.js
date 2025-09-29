@@ -10,39 +10,64 @@ export default [
     output: {
       file: 'dist/animated-noise-text.esm.js',
       format: 'es',
-      sourcemap: true
+      sourcemap: true,
+      exports: 'named'
     },
     plugins: [
       nodeResolve(),
       ...(isProduction ? [terser()] : [])
     ]
   },
-  // UMD build
+  // CommonJS build
   {
     input: 'src/index.js',
     output: {
-      file: 'dist/animated-noise-text.js',
-      format: 'umd',
-      name: 'AnimatedNoiseText',
-      sourcemap: true
+      file: 'dist/animated-noise-text.cjs.js',
+      format: 'cjs',
+      sourcemap: true,
+      exports: 'named'
     },
     plugins: [
       nodeResolve(),
       ...(isProduction ? [terser()] : [])
     ]
   },
-  // Minified UMD build
+  // UMD build (unminified)
   {
     input: 'src/index.js',
     output: {
-      file: 'dist/animated-noise-text.min.js',
+      file: 'dist/animated-noise-text.umd.js',
       format: 'umd',
       name: 'AnimatedNoiseText',
-      sourcemap: true
+      sourcemap: true,
+      exports: 'named'
     },
     plugins: [
       nodeResolve(),
-      terser()
+      ...(isProduction ? [terser()] : [])
+    ]
+  },
+  // UMD build (minified)
+  {
+    input: 'src/index.js',
+    output: {
+      file: 'dist/animated-noise-text.umd.min.js',
+      format: 'umd',
+      name: 'AnimatedNoiseText',
+      sourcemap: true,
+      exports: 'named'
+    },
+    plugins: [
+      nodeResolve(),
+      terser({
+        compress: {
+          drop_console: true,
+          drop_debugger: true
+        },
+        mangle: {
+          reserved: ['AnimatedNoiseText']
+        }
+      })
     ]
   }
 ];

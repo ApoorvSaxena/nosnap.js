@@ -1444,8 +1444,15 @@ class AnimatedNoiseText {
   }
 }
 
-// Export the main class
+// Export the main class as default
 export default AnimatedNoiseText;
 
-// Also provide named export for flexibility
-export { AnimatedNoiseText };
+// Named exports for main class and all components
+export { 
+  AnimatedNoiseText,
+  CanvasManager,
+  NoiseGenerator,
+  TextRenderer,
+  AnimationController,
+  ConfigManager
+};
