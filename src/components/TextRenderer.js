@@ -99,18 +99,26 @@ class TextRenderer {
    * @returns {HTMLCanvasElement} Canvas containing the pixelated text mask
    */
   createPixelatedTextMask(text, blockSize, viewportWidth, viewportHeight) {
-    // Validate inputs
+    // Validate inputs and handle edge cases
     if (typeof text !== 'string') {
       text = String(text || '');
     }
     
     if (blockSize <= 0 || viewportWidth <= 0 || viewportHeight <= 0) {
-      return this._createEmptyMask(blockSize);
+      return this._createEmptyMask(Math.max(1, blockSize));
     }
 
     // Handle empty text early
     if (!text || text.trim() === '') {
-      return this._createEmptyMask(blockSize);
+      return this._createEmptyMask(Math.max(1, blockSize));
+    }
+
+    // Handle special characters and normalize text
+    text = text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, ''); // Remove control characters except \n
+    
+    // If text becomes empty after cleaning, return empty mask
+    if (!text || text.trim() === '') {
+      return this._createEmptyMask(Math.max(1, blockSize));
     }
 
     const lines = text.split('\n');

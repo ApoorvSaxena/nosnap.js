@@ -147,7 +147,7 @@ class AnimatedNoiseText {
   }
 
   /**
-   * Update the text content (Requirement 5.1)
+   * Update the text content dynamically (Requirements 5.1, 5.2, 5.3, 5.4)
    * @param {string} text - New text to display
    */
   setText(text) {
@@ -155,11 +155,45 @@ class AnimatedNoiseText {
       throw new Error('Cannot set text on destroyed instance');
     }
     
-    // Update configuration with new text
-    this.updateConfig({ text });
+    // Handle edge cases for text input (Requirement 5.4)
+    const processedText = this._processTextInput(text);
     
-    // Regenerate text mask with new text
-    this._generateTextMask();
+    // Check if text actually changed to avoid unnecessary work
+    if (processedText === this.config.text) {
+      return; // No change needed
+    }
+    
+    // Store animation state to ensure smooth continuation (Requirement 5.3)
+    const wasRunning = this.isRunning;
+    
+    try {
+      // Update configuration with new text (Requirement 5.1)
+      this.config = { ...this.config, text: processedText };
+      
+      // Update text renderer configuration
+      if (this.textRenderer) {
+        this.textRenderer.updateConfig(this.config);
+      }
+      
+      // Regenerate text mask with new text (Requirement 5.2)
+      this._generateTextMask();
+      
+      // Regenerate noise pattern to match new text mask dimensions if needed
+      if (this.textMask) {
+        this._generateNoisePattern();
+      }
+      
+      // Ensure animation continues without interruption (Requirement 5.3)
+      if (wasRunning && !this.isRunning) {
+        // Restart animation if it was running but got stopped during text update
+        this.start();
+      }
+      
+    } catch (error) {
+      console.error('Error updating text:', error);
+      // Attempt to restore previous state on error
+      throw new Error(`Failed to update text: ${error.message}`);
+    }
   }
 
   /**
@@ -443,6 +477,44 @@ class AnimatedNoiseText {
     
     // Draw the composited result onto the main canvas
     ctx.drawImage(this.compositeCanvas, left, top);
+  }
+
+  /**
+   * Process text input to handle edge cases and special characters (Requirement 5.4)
+   * @private
+   * @param {*} text - Input text (any type)
+   * @returns {string} Processed text string
+   */
+  _processTextInput(text) {
+    // Handle null, undefined, and non-string inputs
+    if (text === null || text === undefined) {
+      return '';
+    }
+    
+    // Convert to string if not already
+    let processedText = String(text);
+    
+    // Handle empty strings and whitespace-only strings
+    if (processedText.trim() === '') {
+      return '';
+    }
+    
+    // Normalize line endings and handle special characters
+    processedText = processedText
+      .replace(/\r\n/g, '\n')  // Normalize Windows line endings
+      .replace(/\r/g, '\n')    // Normalize Mac line endings
+      .replace(/\t/g, '    ');  // Convert tabs to spaces for consistent rendering
+    
+    // Limit text length to prevent performance issues (max 1000 characters)
+    if (processedText.length > 1000) {
+      processedText = processedText.substring(0, 1000);
+      console.warn('Text truncated to 1000 characters for performance reasons');
+    }
+    
+    // Remove or replace problematic characters that might cause rendering issues
+    processedText = processedText.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, ''); // Remove control characters except \n
+    
+    return processedText;
   }
 
   /**

@@ -4,6 +4,69 @@
 
 import AnimatedNoiseText from '../src/index.js';
 
+// Mock canvas and context for testing
+const createMockCanvas = () => {
+  const mockContext = {
+    canvas: null,
+    fillRect: jest.fn(),
+    clearRect: jest.fn(),
+    scale: jest.fn(),
+    drawImage: jest.fn(),
+    fillStyle: '',
+    font: '',
+    textAlign: '',
+    textBaseline: '',
+    fillText: jest.fn(),
+    measureText: jest.fn(() => ({ width: 100 })),
+    getImageData: jest.fn(() => ({
+      data: new Uint8ClampedArray(800 * 600 * 4),
+      width: 800,
+      height: 600
+    })),
+    imageSmoothingEnabled: true,
+    globalCompositeOperation: 'source-over'
+  };
+
+  const mockCanvas = {
+    width: 800,
+    height: 600,
+    style: {
+      width: '800px',
+      height: '600px'
+    },
+    getContext: jest.fn(() => mockContext),
+    getBoundingClientRect: jest.fn(() => ({
+      width: 800,
+      height: 600,
+      top: 0,
+      left: 0,
+      right: 800,
+      bottom: 600
+    }))
+  };
+
+  // Make it pass instanceof check
+  Object.setPrototypeOf(mockCanvas, HTMLCanvasElement.prototype);
+  mockContext.canvas = mockCanvas;
+
+  return mockCanvas;
+};
+
+// Mock document.createElement to return our mock canvas
+const originalCreateElement = document.createElement;
+beforeAll(() => {
+  document.createElement = jest.fn((tagName) => {
+    if (tagName === 'canvas') {
+      return createMockCanvas();
+    }
+    return originalCreateElement.call(document, tagName);
+  });
+});
+
+afterAll(() => {
+  document.createElement = originalCreateElement;
+});
+
 // Mock console.warn to capture warnings
 const originalWarn = console.warn;
 let warnMessages = [];
@@ -23,43 +86,7 @@ describe('AnimatedNoiseText Integration', () => {
   let mockCanvas;
 
   beforeEach(() => {
-    // Create a proper mock canvas element that passes instanceof check
-    mockCanvas = document.createElement('canvas');
-    mockCanvas.width = 800;
-    mockCanvas.height = 600;
-    
-    // Mock getBoundingClientRect for CanvasManager
-    mockCanvas.getBoundingClientRect = jest.fn(() => ({
-      width: 800,
-      height: 600,
-      top: 0,
-      left: 0,
-      right: 800,
-      bottom: 600
-    }));
-    
-    // Mock the canvas context
-    const mockContext = {
-      canvas: mockCanvas,
-      fillRect: jest.fn(),
-      clearRect: jest.fn(),
-      scale: jest.fn(),
-      drawImage: jest.fn(),
-      fillStyle: '',
-      font: '',
-      textAlign: '',
-      textBaseline: '',
-      fillText: jest.fn(),
-      measureText: jest.fn(() => ({ width: 100 })),
-      getImageData: jest.fn(() => ({
-        data: new Uint8ClampedArray(800 * 600 * 4),
-        width: 800,
-        height: 600
-      })),
-      imageSmoothingEnabled: true
-    };
-    
-    mockCanvas.getContext = jest.fn(() => mockContext);
+    mockCanvas = createMockCanvas();
   });
 
   describe('constructor with ConfigManager', () => {
