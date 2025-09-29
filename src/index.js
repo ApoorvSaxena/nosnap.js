@@ -181,10 +181,10 @@ class AnimatedNoiseText {
     // Create offscreen canvases for compositing
     this._createOffscreenCanvases(dimensions);
     
-    // Generate initial text mask
+    // Generate initial text mask (this will resize offscreen canvases to match)
     this._generateTextMask();
     
-    // Generate noise pattern
+    // Generate noise pattern to match text mask dimensions
     this._generateNoisePattern();
   }
 
@@ -194,7 +194,8 @@ class AnimatedNoiseText {
    * @param {Object} dimensions - Canvas dimensions
    */
   _createOffscreenCanvases(dimensions) {
-    // Circle canvas for moving circle effect
+    // Initially create canvases with display dimensions
+    // They will be resized to match text mask dimensions when text mask is generated
     this.circleCanvas = document.createElement('canvas');
     this.circleCanvas.width = dimensions.displayWidth;
     this.circleCanvas.height = dimensions.displayHeight;
@@ -220,6 +221,11 @@ class AnimatedNoiseText {
       dimensions.displayWidth,
       dimensions.displayHeight
     );
+    
+    // Resize offscreen canvases to match text mask dimensions for efficient compositing
+    if (this.textMask && this.circleCanvas && this.compositeCanvas) {
+      this._resizeOffscreenCanvases(this.textMask.width, this.textMask.height);
+    }
   }
 
   /**
@@ -227,12 +233,42 @@ class AnimatedNoiseText {
    * @private
    */
   _generateNoisePattern() {
-    const dimensions = this.canvasManager.getCanvasDimensions();
+    // Generate noise pattern that matches text mask dimensions for efficient tiling
+    if (this.textMask) {
+      this.noiseCanvas = this.noiseGenerator.createNoiseCanvas(
+        this.textMask.width,
+        this.textMask.height
+      );
+    } else {
+      // Fallback to display dimensions if no text mask yet
+      const dimensions = this.canvasManager.getCanvasDimensions();
+      this.noiseCanvas = this.noiseGenerator.createNoiseCanvas(
+        dimensions.displayWidth,
+        dimensions.displayHeight
+      );
+    }
+  }
+
+  /**
+   * Resize offscreen canvases to match text mask dimensions
+   * @private
+   * @param {number} width - New width for offscreen canvases
+   * @param {number} height - New height for offscreen canvases
+   */
+  _resizeOffscreenCanvases(width, height) {
+    // Resize circle canvas
+    if (this.circleCanvas) {
+      this.circleCanvas.width = width;
+      this.circleCanvas.height = height;
+      this.circleCtx = this.circleCanvas.getContext('2d');
+    }
     
-    this.noiseCanvas = this.noiseGenerator.createNoiseCanvas(
-      dimensions.displayWidth,
-      dimensions.displayHeight
-    );
+    // Resize composite canvas
+    if (this.compositeCanvas) {
+      this.compositeCanvas.width = width;
+      this.compositeCanvas.height = height;
+      this.compositeCtx = this.compositeCanvas.getContext('2d');
+    }
   }
 
   /**
@@ -241,11 +277,13 @@ class AnimatedNoiseText {
    * @param {Object} dimensions - New canvas dimensions
    */
   _handleResize(dimensions) {
-    // Recreate offscreen canvases with new dimensions
+    // Recreate offscreen canvases with new dimensions (will be resized to match text mask)
     this._createOffscreenCanvases(dimensions);
     
-    // Regenerate text mask and noise pattern
+    // Regenerate text mask first (this will resize offscreen canvases to match)
     this._generateTextMask();
+    
+    // Then regenerate noise pattern to match text mask dimensions
     this._generateNoisePattern();
   }
 
@@ -292,18 +330,62 @@ class AnimatedNoiseText {
     const ctx = this.canvasManager.getContext();
     const dimensions = this.canvasManager.getCanvasDimensions();
     
-    // Clear main canvas
+    // Clear main canvas and render background noise
     ctx.clearRect(0, 0, dimensions.displayWidth, dimensions.displayHeight);
+    this.noiseGenerator.renderDirectNoise(ctx, dimensions.displayWidth, dimensions.displayHeight);
     
-    // This is a placeholder for the actual animation rendering
-    // The full animation pipeline will be implemented in task 8
-    // For now, just render the text mask to show integration is working
-    if (this.textMask) {
-      ctx.drawImage(this.textMask, 
-        (dimensions.displayWidth - this.textMask.width) / 2,
-        (dimensions.displayHeight - this.textMask.height) / 2
-      );
+    // Render the moving circle animation if we have a text mask
+    if (this.textMask && this.noiseCanvas) {
+      this._drawMovingCircle(offset);
     }
+  }
+
+  /**
+   * Draw the moving circle animation with proper canvas compositing
+   * Ported from the original drawMovingCircle function
+   * @private
+   * @param {number} offset - Current animation offset
+   */
+  _drawMovingCircle(offset) {
+    const ctx = this.canvasManager.getContext();
+    const dimensions = this.canvasManager.getCanvasDimensions();
+    const cx = Math.floor(dimensions.displayWidth / 2);
+    const cy = Math.floor(dimensions.displayHeight / 2);
+    
+    // Ensure we have all required resources
+    if (!this.textMask || !this.noiseCanvas || !this.circleCtx || !this.compositeCtx) {
+      return;
+    }
+    
+    // Align the text to the grid based on mask block size
+    const left = Math.round((cx - this.textMask.width / 2) / this.config.maskBlockSize) * this.config.maskBlockSize;
+    const top = Math.round((cy - this.textMask.height / 2) / this.config.maskBlockSize) * this.config.maskBlockSize;
+    
+    // Calculate moving offset based on step pixels and animation offset
+    const movingOffset = (offset * this.config.stepPixels) % this.noiseCanvas.height;
+    
+    // Render the moving noise into the circle buffer
+    this.circleCtx.imageSmoothingEnabled = false;
+    this.circleCtx.clearRect(0, 0, this.circleCanvas.width, this.circleCanvas.height);
+    
+    // Tile the noise pattern vertically with moving offset
+    const tileHeight = this.noiseCanvas.height;
+    const startY = -tileHeight + (movingOffset % tileHeight);
+    
+    for (let y = startY; y < this.circleCanvas.height; y += tileHeight) {
+      this.circleCtx.drawImage(this.noiseCanvas, 0, y);
+    }
+    
+    // Apply the pixelated text mask using composite operations
+    this.compositeCtx.imageSmoothingEnabled = false;
+    this.compositeCtx.globalCompositeOperation = 'copy';
+    this.compositeCtx.drawImage(this.circleCanvas, 0, 0);
+    this.compositeCtx.globalCompositeOperation = 'destination-in';
+    this.compositeCtx.drawImage(this.textMask, 0, 0);
+    this.compositeCtx.globalCompositeOperation = 'source-over';
+    
+    // Draw the composited result onto the main canvas
+    ctx.drawImage(this.compositeCanvas, left, top);
   }
 
   /**
