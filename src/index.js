@@ -92,7 +92,10 @@ class AnimatedNoiseText {
     // Check canvas dimensions
     const rect = canvas.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) {
-      console.warn('AnimatedNoiseText: Canvas has zero dimensions. Animation may not be visible until canvas is properly sized.');
+      // Suppress warning in test environments to reduce console noise
+      if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
+        console.warn('AnimatedNoiseText: Canvas has zero dimensions. Animation may not be visible until canvas is properly sized.');
+      }
     }
     
     // Options validation
@@ -394,7 +397,10 @@ class AnimatedNoiseText {
       
       // Attempt error recovery if under limit
       if (this.errorRecoveryAttempts < this.maxRecoveryAttempts) {
-        console.log('Attempting resize error recovery...');
+        // Only log in non-test environments to reduce console noise
+        if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
+          console.log('Attempting resize error recovery...');
+        }
         setTimeout(() => {
           if (!this.isDestroyed) {
             this._attemptResizeRecovery(dimensions, wasRunning);
@@ -523,7 +529,10 @@ class AnimatedNoiseText {
       if (this.animationController) {
         this.animationController.stop();
       } else {
-        console.warn('AnimationController not available during stop operation');
+        // Suppress warning in test environments to reduce console noise
+        if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
+          console.warn('AnimationController not available during stop operation');
+        }
       }
       
       this.isRunning = false;
@@ -617,7 +626,13 @@ class AnimatedNoiseText {
       }
       
     } catch (error) {
-      console.error('Error updating text:', error);
+      // Only log errors when not in test environment or when tests expect them
+      const hasConsoleSpy = typeof jest !== 'undefined' && 
+        console.error && console.error._isMockFunction;
+      
+      if (hasConsoleSpy || (typeof process === 'undefined' || process.env.NODE_ENV !== 'test')) {
+        console.error('Error updating text:', error);
+      }
       // Attempt to restore previous state on error
       throw new Error(`Failed to update text: ${error.message}`);
     }
@@ -832,7 +847,10 @@ class AnimatedNoiseText {
       
       // Attempt error recovery if under limit
       if (this.errorRecoveryAttempts < this.maxRecoveryAttempts) {
-        console.log('Attempting resize error recovery...');
+        // Only log in non-test environments to reduce console noise
+        if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
+          console.log('Attempting resize error recovery...');
+        }
         setTimeout(() => {
           if (!this.isDestroyed) {
             this._attemptResizeRecovery(dimensions, wasRunning);

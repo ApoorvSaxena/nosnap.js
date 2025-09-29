@@ -59,7 +59,10 @@ class AnimationController {
       if (typeof testTime !== 'number' || !Number.isFinite(testTime)) {
         // In test environments, try to fix the performance.now mock
         if (typeof jest !== 'undefined' && typeof global !== 'undefined') {
-          console.warn('AnimationController: performance.now() returned invalid value in test environment, attempting to fix');
+          // Suppress warning in test environments to reduce console noise
+          if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
+            console.warn('AnimationController: performance.now() returned invalid value in test environment, attempting to fix');
+          }
           // Try to reset the mock to return valid values
           if (global.performance && global.performance.now && global.performance.now.mockImplementation) {
             let counter = 16.67;
@@ -70,7 +73,10 @@ class AnimationController {
             // Test again
             const retestTime = performance.now();
             if (typeof retestTime === 'number' && Number.isFinite(retestTime)) {
-              console.warn('AnimationController: Successfully fixed performance.now() mock');
+              // Suppress success message in test environments to reduce console noise
+              if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
+                console.warn('AnimationController: Successfully fixed performance.now() mock');
+              }
             } else {
               throw new Error(`performance.now() returned invalid value even after fix attempt: ${retestTime}. Expected a finite number.`);
             }
@@ -120,7 +126,10 @@ class AnimationController {
         this.animationId = null;
       }
     } catch (error) {
-      console.warn('AnimationController: Failed to cancel animation frame:', error.message);
+      // Suppress warning in test environments to reduce console noise
+      if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
+        console.warn('AnimationController: Failed to cancel animation frame:', error.message);
+      }
       // Force clear the ID even if cancellation failed
       this.animationId = null;
     }
@@ -139,7 +148,10 @@ class AnimationController {
       // Stop any running animation
       this.stop();
     } catch (error) {
-      console.warn('AnimationController: Failed to stop during destroy:', error.message);
+      // Suppress warning in test environments to reduce console noise
+      if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
+        console.warn('AnimationController: Failed to stop during destroy:', error.message);
+      }
     }
     
     try {
@@ -153,7 +165,10 @@ class AnimationController {
       this.animationCallback = null;
       this.animationId = null;
     } catch (error) {
-      console.warn('AnimationController: Failed to reset state during destroy:', error.message);
+      // Suppress warning in test environments to reduce console noise
+      if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
+        console.warn('AnimationController: Failed to reset state during destroy:', error.message);
+      }
     }
   }
 
