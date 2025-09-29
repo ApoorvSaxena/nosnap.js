@@ -3,50 +3,223 @@
  */
 class CanvasManager {
   constructor(canvas) {
-    if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
-      throw new Error('CanvasManager requires a valid HTMLCanvasElement');
-    }
+    // Comprehensive input validation
+    this._validateCanvasInput(canvas);
     
     this.canvas = canvas;
-    this.ctx = canvas.getContext('2d');
     this.resizeCallback = null;
     this.resizeHandler = null;
     this.containerObserver = null;
     this.isDestroyed = false;
+    this.contextLost = false;
+    this.recoveryAttempts = 0;
+    this.maxRecoveryAttempts = 3;
     
-    if (!this.ctx) {
-      throw new Error('Failed to get 2D rendering context from canvas');
+    // Get canvas context with error handling and recovery
+    this._initializeCanvasContext();
+    
+    // Set up context lost/restored event handlers
+    this._setupContextEventHandlers();
+    
+    // Initial canvas setup
+    try {
+      this.setupCanvas();
+    } catch (error) {
+      throw new Error(`Canvas setup failed: ${error.message}`);
     }
-    
-    this.setupCanvas();
   }
 
   /**
-   * Sets up the canvas with proper device pixel ratio handling
+   * Validate canvas input with detailed error messages
+   * @private
+   * @param {*} canvas - Canvas element to validate
+   */
+  _validateCanvasInput(canvas) {
+    if (canvas === null || canvas === undefined) {
+      throw new Error('CanvasManager: canvas parameter is required. Received: ' + canvas);
+    }
+    
+    if (!(canvas instanceof HTMLCanvasElement)) {
+      const actualType = canvas.constructor ? canvas.constructor.name : typeof canvas;
+      throw new Error(`CanvasManager: Expected HTMLCanvasElement, received: ${actualType}. Please provide a valid <canvas> element.`);
+    }
+    
+    // Check if canvas is in a valid state
+    if (canvas.width < 0 || canvas.height < 0) {
+      throw new Error('CanvasManager: Canvas has invalid dimensions');
+    }
+    
+    // Warn about potential issues
+    try {
+      if (!canvas.parentNode) {
+        console.warn('CanvasManager: Canvas is not attached to DOM. This may cause issues with resize detection.');
+      }
+    } catch (error) {
+      // Ignore parentNode access errors in test environments
+    }
+  }
+
+  /**
+   * Initialize canvas context with error handling
+   * @private
+   */
+  _initializeCanvasContext() {
+    try {
+      this.ctx = this.canvas.getContext('2d');
+      
+      if (!this.ctx) {
+        throw new Error('Failed to get 2D rendering context. This may indicate browser compatibility issues or canvas corruption.');
+      }
+      
+      // Test basic context functionality
+      try {
+        this.ctx.save();
+        this.ctx.restore();
+      } catch (testError) {
+        throw new Error(`Canvas context is not functional: ${testError.message}`);
+      }
+      
+    } catch (error) {
+      throw new Error(`Canvas context initialization failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Set up context lost/restored event handlers for error recovery
+   * @private
+   */
+  _setupContextEventHandlers() {
+    try {
+      // Handle context lost events
+      this.canvas.addEventListener('webglcontextlost', (event) => {
+        console.warn('Canvas context lost');
+        event.preventDefault();
+        this.contextLost = true;
+      });
+      
+      // Handle context restored events
+      this.canvas.addEventListener('webglcontextrestored', () => {
+        console.log('Canvas context restored, attempting recovery');
+        this.contextLost = false;
+        this._attemptContextRecovery();
+      });
+      
+    } catch (error) {
+      console.warn('Failed to set up context event handlers:', error.message);
+    }
+  }
+
+  /**
+   * Attempt to recover from context loss
+   * @private
+   */
+  _attemptContextRecovery() {
+    if (this.recoveryAttempts >= this.maxRecoveryAttempts) {
+      console.error('Maximum context recovery attempts reached');
+      return;
+    }
+    
+    this.recoveryAttempts++;
+    
+    try {
+      // Reinitialize context
+      this._initializeCanvasContext();
+      
+      // Reconfigure canvas
+      this.setupCanvas();
+      
+      console.log('Canvas context recovery successful');
+      this.recoveryAttempts = 0;
+      
+    } catch (error) {
+      console.error(`Context recovery attempt ${this.recoveryAttempts} failed:`, error.message);
+    }
+  }
+
+  /**
+   * Sets up the canvas with proper device pixel ratio handling and comprehensive error handling
    */
   setupCanvas() {
-    if (this.isDestroyed) return;
+    if (this.isDestroyed) {
+      console.warn('CanvasManager.setupCanvas: Cannot setup destroyed canvas manager');
+      return;
+    }
     
-    const dpr = this.getDevicePixelRatio();
-    const rect = this.canvas.getBoundingClientRect();
+    if (this.contextLost) {
+      console.warn('CanvasManager.setupCanvas: Cannot setup canvas with lost context');
+      return;
+    }
     
-    // Set the actual size in memory (scaled for device pixel ratio)
-    this.canvas.width = rect.width * dpr;
-    this.canvas.height = rect.height * dpr;
-    
-    // Scale the canvas back down using CSS
-    this.canvas.style.width = rect.width + 'px';
-    this.canvas.style.height = rect.height + 'px';
-    
-    // Scale the drawing context so everything draws at the correct size
-    this.ctx.scale(dpr, dpr);
-    
-    // Store dimensions for easy access
-    this.displayWidth = rect.width;
-    this.displayHeight = rect.height;
-    this.actualWidth = this.canvas.width;
-    this.actualHeight = this.canvas.height;
-    this.devicePixelRatio = dpr;
+    try {
+      // Validate context is still available
+      if (!this.ctx) {
+        throw new Error('Canvas context is not available');
+      }
+      
+      // Get device pixel ratio with fallback
+      const dpr = this.getDevicePixelRatio();
+      if (!Number.isFinite(dpr) || dpr <= 0) {
+        throw new Error(`Invalid device pixel ratio: ${dpr}`);
+      }
+      
+      // Get canvas bounding rect with error handling
+      let rect;
+      try {
+        rect = this.canvas.getBoundingClientRect();
+      } catch (error) {
+        throw new Error(`Failed to get canvas bounding rect: ${error.message}`);
+      }
+      
+      // Validate rect dimensions
+      if (!rect || rect.width <= 0 || rect.height <= 0) {
+        throw new Error(`Invalid canvas dimensions: ${rect ? rect.width + 'x' + rect.height : 'null rect'}`);
+      }
+      
+      // Calculate actual dimensions with bounds checking
+      const actualWidth = Math.floor(rect.width * dpr);
+      const actualHeight = Math.floor(rect.height * dpr);
+      
+      // Check for reasonable size limits to prevent memory issues
+      const maxDimension = 16384; // 16K limit
+      if (actualWidth > maxDimension || actualHeight > maxDimension) {
+        throw new Error(`Canvas dimensions too large: ${actualWidth}x${actualHeight} (max: ${maxDimension})`);
+      }
+      
+      // Set the actual size in memory (scaled for device pixel ratio)
+      try {
+        this.canvas.width = actualWidth;
+        this.canvas.height = actualHeight;
+      } catch (error) {
+        throw new Error(`Failed to set canvas dimensions: ${error.message}`);
+      }
+      
+      // Scale the canvas back down using CSS
+      try {
+        this.canvas.style.width = rect.width + 'px';
+        this.canvas.style.height = rect.height + 'px';
+      } catch (error) {
+        console.warn('Failed to set canvas CSS dimensions:', error.message);
+      }
+      
+      // Scale the drawing context so everything draws at the correct size
+      try {
+        // Reset transform first to avoid accumulating transforms
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.ctx.scale(dpr, dpr);
+      } catch (error) {
+        throw new Error(`Failed to scale canvas context: ${error.message}`);
+      }
+      
+      // Store dimensions for easy access
+      this.displayWidth = rect.width;
+      this.displayHeight = rect.height;
+      this.actualWidth = actualWidth;
+      this.actualHeight = actualHeight;
+      this.devicePixelRatio = dpr;
+      
+    } catch (error) {
+      throw new Error(`Canvas setup failed: ${error.message}`);
+    }
   }
 
   /**

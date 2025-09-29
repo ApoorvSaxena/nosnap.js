@@ -126,19 +126,19 @@ describe('NoiseGenerator', () => {
     test('should throw error for non-number cell size', () => {
       expect(() => {
         noiseGenerator.setCellSize('invalid');
-      }).toThrow('Cell size must be a positive number');
+      }).toThrow('Cell size must be a number');
     });
 
     test('should throw error for zero cell size', () => {
       expect(() => {
         noiseGenerator.setCellSize(0);
-      }).toThrow('Cell size must be a positive number');
+      }).toThrow('Cell size must be positive');
     });
 
     test('should throw error for negative cell size', () => {
       expect(() => {
         noiseGenerator.setCellSize(-1);
-      }).toThrow('Cell size must be a positive number');
+      }).toThrow('Cell size must be positive');
     });
   });
 
@@ -186,13 +186,10 @@ describe('NoiseGenerator', () => {
     test('should handle edge case of zero dimensions gracefully', () => {
       const mockCtx = createMockContext();
       
-      // Should not throw error with zero dimensions
+      // Zero dimensions should now throw an error with enhanced error handling
       expect(() => {
         noiseGenerator.renderDirectNoise(mockCtx, 0, 0);
-      }).not.toThrow();
-      
-      // Should not make any fillRect calls
-      expect(mockCtx.fillRect).not.toHaveBeenCalled();
+      }).toThrow('width and height must be positive');
     });
 
     test('should calculate correct number of cells', () => {

@@ -91,7 +91,7 @@ class TextRenderer {
   }
 
   /**
-   * Create a pixelated text mask canvas
+   * Create a pixelated text mask canvas with comprehensive error handling
    * @param {string} text - Text to render
    * @param {number} blockSize - Size of pixelation blocks
    * @param {number} viewportWidth - Viewport width
@@ -99,63 +99,175 @@ class TextRenderer {
    * @returns {HTMLCanvasElement} Canvas containing the pixelated text mask
    */
   createPixelatedTextMask(text, blockSize, viewportWidth, viewportHeight) {
-    // Validate inputs and handle edge cases
-    if (typeof text !== 'string') {
-      text = String(text || '');
+    try {
+      // Comprehensive input validation
+      this._validateTextMaskInputs(text, blockSize, viewportWidth, viewportHeight);
+      
+      // Validate and process text input
+      const processedText = this._validateAndProcessText(text);
+      
+      // Handle empty text early
+      if (!processedText || processedText.trim() === '') {
+        return this._createEmptyMask(Math.max(1, blockSize));
+      }
+
+      const lines = processedText.split('\n');
+      
+      // Create scratch canvas for text rendering with error handling
+      const { scratch, sctx } = this._createScratchCanvas(viewportWidth, viewportHeight);
+
+      // Calculate target dimensions (85% width, 60% height of viewport)
+      const targetWidth = Math.max(1, Math.floor(viewportWidth * 0.85));
+      const targetHeight = Math.max(1, Math.floor(viewportHeight * 0.6));
+
+      // Determine font size with error handling
+      let fontSize;
+      try {
+        if (this.config.fontSize && this.config.fontSize > 0) {
+          fontSize = this.config.fontSize;
+        } else {
+          fontSize = this.calculateOptimalFontSize(processedText, targetWidth, targetHeight, sctx);
+        }
+      } catch (fontError) {
+        console.warn('Font size calculation failed, using fallback:', fontError.message);
+        fontSize = Math.min(24, Math.floor(targetHeight / Math.max(1, lines.length)));
+      }
+
+      // Render text to scratch canvas with error handling
+      try {
+        this._renderTextToCanvas(sctx, lines, fontSize, viewportWidth, viewportHeight);
+      } catch (renderError) {
+        throw new Error(`Text rendering failed: ${renderError.message}`);
+      }
+
+      // Extract image data and find text bounds with error handling
+      let imageData, bounds;
+      try {
+        imageData = sctx.getImageData(0, 0, scratch.width, scratch.height);
+        bounds = this._findTextBounds(imageData);
+      } catch (dataError) {
+        throw new Error(`Image data extraction failed: ${dataError.message}`);
+      }
+
+      // Handle empty text case
+      if (!bounds) {
+        console.warn('No text bounds found, creating empty mask');
+        return this._createEmptyMask(blockSize);
+      }
+
+      // Create pixelated mask from text bounds with error handling
+      try {
+        return this._createPixelatedMask(imageData, bounds, blockSize);
+      } catch (maskError) {
+        throw new Error(`Pixelated mask creation failed: ${maskError.message}`);
+      }
+      
+    } catch (error) {
+      console.error('TextRenderer.createPixelatedTextMask failed:', error.message);
+      // Return fallback empty mask on any error
+      return this._createEmptyMask(Math.max(1, blockSize || 2));
+    }
+  }
+
+  /**
+   * Validate inputs for text mask creation
+   * @private
+   * @param {*} text - Text input to validate
+   * @param {*} blockSize - Block size to validate
+   * @param {*} viewportWidth - Viewport width to validate
+   * @param {*} viewportHeight - Viewport height to validate
+   */
+  _validateTextMaskInputs(text, blockSize, viewportWidth, viewportHeight) {
+    // Block size validation
+    if (typeof blockSize !== 'number') {
+      throw new Error(`TextRenderer: blockSize must be a number. Received: ${typeof blockSize}`);
+    }
+    if (!Number.isFinite(blockSize) || blockSize <= 0) {
+      throw new Error(`TextRenderer: blockSize must be a positive finite number. Received: ${blockSize}`);
+    }
+    if (blockSize > 50) {
+      throw new Error(`TextRenderer: blockSize too large (max 50px). Received: ${blockSize}`);
     }
     
-    if (blockSize <= 0 || viewportWidth <= 0 || viewportHeight <= 0) {
-      return this._createEmptyMask(Math.max(1, blockSize));
+    // Viewport dimensions validation
+    if (typeof viewportWidth !== 'number' || typeof viewportHeight !== 'number') {
+      throw new Error(`TextRenderer: viewport dimensions must be numbers. Received: width=${typeof viewportWidth}, height=${typeof viewportHeight}`);
     }
+    if (!Number.isFinite(viewportWidth) || !Number.isFinite(viewportHeight)) {
+      throw new Error(`TextRenderer: viewport dimensions must be finite numbers. Received: width=${viewportWidth}, height=${viewportHeight}`);
+    }
+    if (viewportWidth <= 0 || viewportHeight <= 0) {
+      throw new Error(`TextRenderer: viewport dimensions must be positive. Received: ${viewportWidth}x${viewportHeight}`);
+    }
+    
+    // Check for reasonable size limits
+    const maxDimension = 8192;
+    if (viewportWidth > maxDimension || viewportHeight > maxDimension) {
+      throw new Error(`TextRenderer: viewport dimensions too large (max ${maxDimension}px). Received: ${viewportWidth}x${viewportHeight}`);
+    }
+  }
 
-    // Handle empty text early
-    if (!text || text.trim() === '') {
-      return this._createEmptyMask(Math.max(1, blockSize));
+  /**
+   * Validate and process text input
+   * @private
+   * @param {*} text - Text input to validate and process
+   * @returns {string} Processed text
+   */
+  _validateAndProcessText(text) {
+    // Convert to string if not already
+    let processedText;
+    try {
+      processedText = String(text || '');
+    } catch (error) {
+      throw new Error(`Failed to convert text to string: ${error.message}`);
     }
 
     // Handle special characters and normalize text
-    text = text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, ''); // Remove control characters except \n
+    try {
+      processedText = processedText.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, ''); // Remove control characters except \n
+    } catch (error) {
+      console.warn('Text normalization failed, using original text:', error.message);
+    }
     
-    // If text becomes empty after cleaning, return empty mask
-    if (!text || text.trim() === '') {
-      return this._createEmptyMask(Math.max(1, blockSize));
+    // Limit text length to prevent performance issues
+    const maxLength = 1000;
+    if (processedText.length > maxLength) {
+      processedText = processedText.substring(0, maxLength);
+      console.warn(`Text truncated to ${maxLength} characters for performance reasons`);
     }
-
-    const lines = text.split('\n');
     
-    // Create scratch canvas for text rendering
-    const scratch = document.createElement('canvas');
-    scratch.width = viewportWidth;
-    scratch.height = viewportHeight;
-    const sctx = scratch.getContext('2d');
-    sctx.imageSmoothingEnabled = false;
+    return processedText;
+  }
 
-    // Calculate target dimensions (85% width, 60% height of viewport)
-    const targetWidth = Math.max(1, Math.floor(viewportWidth * 0.85));
-    const targetHeight = Math.max(1, Math.floor(viewportHeight * 0.6));
-
-    // Determine font size
-    let fontSize;
-    if (this.config.fontSize && this.config.fontSize > 0) {
-      fontSize = this.config.fontSize;
-    } else {
-      fontSize = this.calculateOptimalFontSize(text, targetWidth, targetHeight, sctx);
+  /**
+   * Create scratch canvas with error handling
+   * @private
+   * @param {number} width - Canvas width
+   * @param {number} height - Canvas height
+   * @returns {Object} Object containing scratch canvas and context
+   */
+  _createScratchCanvas(width, height) {
+    try {
+      const scratch = document.createElement('canvas');
+      if (!scratch) {
+        throw new Error('Failed to create scratch canvas element');
+      }
+      
+      scratch.width = Math.floor(width);
+      scratch.height = Math.floor(height);
+      
+      const sctx = scratch.getContext('2d');
+      if (!sctx) {
+        throw new Error('Failed to get 2D context for scratch canvas');
+      }
+      
+      sctx.imageSmoothingEnabled = false;
+      
+      return { scratch, sctx };
+      
+    } catch (error) {
+      throw new Error(`Scratch canvas creation failed: ${error.message}`);
     }
-
-    // Render text to scratch canvas
-    this._renderTextToCanvas(sctx, lines, fontSize, viewportWidth, viewportHeight);
-
-    // Extract image data and find text bounds
-    const imageData = sctx.getImageData(0, 0, scratch.width, scratch.height);
-    const bounds = this._findTextBounds(imageData);
-
-    // Handle empty text case
-    if (!bounds) {
-      return this._createEmptyMask(blockSize);
-    }
-
-    // Create pixelated mask from text bounds
-    return this._createPixelatedMask(imageData, bounds, blockSize);
   }
 
   /**
@@ -277,8 +389,9 @@ class TextRenderer {
    */
   _createEmptyMask(blockSize) {
     const empty = document.createElement('canvas');
-    empty.width = Math.max(1, blockSize);
-    empty.height = Math.max(1, blockSize);
+    const size = Math.max(1, Math.floor(blockSize) || 2);
+    empty.width = size;
+    empty.height = size;
     return empty;
   }
 

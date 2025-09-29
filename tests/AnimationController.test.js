@@ -62,7 +62,7 @@ describe('AnimationController', () => {
     });
 
     test('should throw error when starting without callback', () => {
-      expect(() => controller.start()).toThrow('Animation callback must be a function');
+      expect(() => controller.start()).toThrow('Animation callback is required');
       expect(() => controller.start('not a function')).toThrow('Animation callback must be a function');
     });
 

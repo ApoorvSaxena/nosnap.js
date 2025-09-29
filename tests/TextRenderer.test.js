@@ -223,7 +223,7 @@ describe('TextRenderer', () => {
       
       expect(mask1.width).toBe(2);
       expect(mask2.width).toBe(2);
-      expect(mask3.width).toBe(1); // blockSize 0 becomes 1
+      expect(mask3.width).toBe(2); // blockSize 0 becomes 2 (fallback)
     });
 
     test('should use custom font size when provided', () => {
@@ -290,8 +290,8 @@ describe('TextRenderer', () => {
       const mask1 = textRenderer._createEmptyMask(0);
       const mask2 = textRenderer._createEmptyMask(-5);
       
-      expect(mask1.width).toBe(1); // Should be at least 1
-      expect(mask2.width).toBe(1);
+      expect(mask1.width).toBe(2); // 0 || 2 = 2, Math.max(1, 2) = 2
+      expect(mask2.width).toBe(1); // Math.floor(-5) = -5, Math.max(1, -5) = 1
     });
   });
 
