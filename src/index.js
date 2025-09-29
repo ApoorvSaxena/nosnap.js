@@ -38,6 +38,11 @@ class AnimatedNoiseText {
     this.isRunning = false;
     this.isDestroyed = false;
     
+    // Memory leak prevention for long-running animations
+    this.frameCount = 0;
+    this.lastCleanupTime = Date.now();
+    this.cleanupInterval = 300000; // 5 minutes in milliseconds
+    
     // Initialize all component classes
     try {
       // Canvas management with resize handling (Requirement 1.2)
@@ -104,10 +109,14 @@ class AnimatedNoiseText {
     
     try {
       // Stop animation controller
-      this.animationController.stop();
+      if (this.animationController) {
+        this.animationController.stop();
+      }
       this.isRunning = false;
     } catch (error) {
       console.error('Failed to stop animation:', error);
+      // Force stop even if error occurred
+      this.isRunning = false;
     }
   }
 
@@ -119,13 +128,22 @@ class AnimatedNoiseText {
       return; // Already destroyed
     }
     
-    // Stop animation first
-    this.stop();
+    try {
+      // Stop animation first
+      this.stop();
+    } catch (error) {
+      console.error('Error stopping animation during destroy:', error);
+    }
     
-    // Clean up all resources
-    this._cleanup();
-    
-    this.isDestroyed = true;
+    try {
+      // Clean up all resources
+      this._cleanup();
+    } catch (error) {
+      console.error('Error during resource cleanup:', error);
+    } finally {
+      // Always mark as destroyed, even if cleanup failed
+      this.isDestroyed = true;
+    }
   }
 
   /**
@@ -327,16 +345,55 @@ class AnimatedNoiseText {
       return;
     }
     
-    const ctx = this.canvasManager.getContext();
-    const dimensions = this.canvasManager.getCanvasDimensions();
+    try {
+      const ctx = this.canvasManager.getContext();
+      const dimensions = this.canvasManager.getCanvasDimensions();
+      
+      // Clear main canvas and render background noise
+      ctx.clearRect(0, 0, dimensions.displayWidth, dimensions.displayHeight);
+      this.noiseGenerator.renderDirectNoise(ctx, dimensions.displayWidth, dimensions.displayHeight);
+      
+      // Render the moving circle animation if we have a text mask
+      if (this.textMask && this.noiseCanvas) {
+        this._drawMovingCircle(offset);
+      }
+      
+      // Periodic cleanup for memory leak prevention
+      this._performPeriodicCleanup();
+      
+    } catch (error) {
+      console.error('Error during frame rendering:', error);
+      // Continue animation even if a single frame fails
+    }
+  }
+
+  /**
+   * Perform periodic cleanup to prevent memory leaks in long-running animations
+   * @private
+   */
+  _performPeriodicCleanup() {
+    this.frameCount++;
+    const currentTime = Date.now();
     
-    // Clear main canvas and render background noise
-    ctx.clearRect(0, 0, dimensions.displayWidth, dimensions.displayHeight);
-    this.noiseGenerator.renderDirectNoise(ctx, dimensions.displayWidth, dimensions.displayHeight);
-    
-    // Render the moving circle animation if we have a text mask
-    if (this.textMask && this.noiseCanvas) {
-      this._drawMovingCircle(offset);
+    // Perform cleanup every 5 minutes or every 10000 frames, whichever comes first
+    if (currentTime - this.lastCleanupTime > this.cleanupInterval || this.frameCount % 10000 === 0) {
+      try {
+        // Clear text renderer cache periodically to prevent memory buildup
+        if (this.textRenderer && this.textRenderer.getCacheSize() > 100) {
+          this.textRenderer.clearCache();
+        }
+        
+        // Force garbage collection hint (if available)
+        if (typeof window !== 'undefined' && window.gc) {
+          window.gc();
+        }
+        
+        this.lastCleanupTime = currentTime;
+        this.frameCount = 0;
+        
+      } catch (error) {
+        console.warn('Error during periodic cleanup:', error);
+      }
     }
   }
 
@@ -393,27 +450,105 @@ class AnimatedNoiseText {
    * @private
    */
   _cleanup() {
+    const errors = [];
+    
+    try {
+      // Stop animation controller and clean up
+      if (this.animationController) {
+        this.animationController.destroy();
+        this.animationController = null;
+      }
+    } catch (error) {
+      errors.push(`AnimationController cleanup failed: ${error.message}`);
+    }
+    
     try {
       // Clean up canvas manager
       if (this.canvasManager) {
         this.canvasManager.cleanup();
+        this.canvasManager = null;
       }
-      
-      // Clear text renderer cache
-      if (this.textRenderer) {
-        this.textRenderer.clearCache();
-      }
-      
-      // Clear references to offscreen canvases
-      this.circleCanvas = null;
-      this.circleCtx = null;
-      this.compositeCanvas = null;
-      this.compositeCtx = null;
-      this.textMask = null;
-      this.noiseCanvas = null;
-      
     } catch (error) {
-      console.error('Error during cleanup:', error);
+      errors.push(`CanvasManager cleanup failed: ${error.message}`);
+    }
+    
+    try {
+      // Destroy text renderer
+      if (this.textRenderer) {
+        this.textRenderer.destroy();
+        this.textRenderer = null;
+      }
+    } catch (error) {
+      errors.push(`TextRenderer cleanup failed: ${error.message}`);
+    }
+    
+    try {
+      // Destroy noise generator
+      if (this.noiseGenerator) {
+        this.noiseGenerator.destroy();
+        this.noiseGenerator = null;
+      }
+    } catch (error) {
+      errors.push(`NoiseGenerator cleanup failed: ${error.message}`);
+    }
+    
+    try {
+      // Clear references to offscreen canvases and contexts
+      if (this.circleCanvas) {
+        // Clear the canvas before disposing
+        if (this.circleCtx) {
+          this.circleCtx.clearRect(0, 0, this.circleCanvas.width, this.circleCanvas.height);
+        }
+        this.circleCanvas.width = 0;
+        this.circleCanvas.height = 0;
+        this.circleCanvas = null;
+        this.circleCtx = null;
+      }
+      
+      if (this.compositeCanvas) {
+        // Clear the canvas before disposing
+        if (this.compositeCtx) {
+          this.compositeCtx.clearRect(0, 0, this.compositeCanvas.width, this.compositeCanvas.height);
+        }
+        this.compositeCanvas.width = 0;
+        this.compositeCanvas.height = 0;
+        this.compositeCanvas = null;
+        this.compositeCtx = null;
+      }
+      
+      if (this.textMask) {
+        // Clear the text mask canvas
+        this.textMask.width = 0;
+        this.textMask.height = 0;
+        this.textMask = null;
+      }
+      
+      if (this.noiseCanvas) {
+        // Clear the noise canvas
+        this.noiseCanvas.width = 0;
+        this.noiseCanvas.height = 0;
+        this.noiseCanvas = null;
+      }
+    } catch (error) {
+      errors.push(`Canvas cleanup failed: ${error.message}`);
+    }
+    
+    try {
+      // Clear configuration manager reference
+      this.configManager = null;
+      
+      // Clear canvas reference
+      this.canvas = null;
+      
+      // Reset configuration to prevent memory leaks
+      this.config = null;
+    } catch (error) {
+      errors.push(`Reference cleanup failed: ${error.message}`);
+    }
+    
+    // Log any cleanup errors that occurred
+    if (errors.length > 0) {
+      console.error('Errors occurred during cleanup:', errors);
     }
   }
 }

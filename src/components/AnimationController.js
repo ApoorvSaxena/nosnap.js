@@ -45,6 +45,25 @@ class AnimationController {
   }
 
   /**
+   * Destroy the animation controller and clean up all resources
+   * This method ensures complete cleanup for memory leak prevention
+   */
+  destroy() {
+    // Stop any running animation
+    this.stop();
+    
+    // Reset all state to initial values
+    this.animationOffset = 0;
+    this.lastFrameTime = 0;
+    this.accumulatedTime = 0;
+    this.stepMs = 32; // Reset to default
+    
+    // Clear any remaining references
+    this.animationCallback = null;
+    this.animationId = null;
+  }
+
+  /**
    * Pause the animation loop
    */
   pause() {

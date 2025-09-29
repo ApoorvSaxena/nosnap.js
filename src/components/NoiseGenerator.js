@@ -93,6 +93,15 @@ class NoiseGenerator {
   getCellSize() {
     return this.cellSize;
   }
+
+  /**
+   * Destroy the noise generator and clean up all resources
+   * This method ensures complete cleanup for memory leak prevention
+   */
+  destroy() {
+    // Reset cell size to default
+    this.cellSize = 2;
+  }
 }
 
 export default NoiseGenerator;

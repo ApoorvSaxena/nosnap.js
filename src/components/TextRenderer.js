@@ -289,6 +289,23 @@ class TextRenderer {
   getCacheSize() {
     return this.fontMeasurementCache.size;
   }
+
+  /**
+   * Destroy the text renderer and clean up all resources
+   * This method ensures complete cleanup for memory leak prevention
+   */
+  destroy() {
+    // Clear the font measurement cache
+    this.clearCache();
+    
+    // Reset configuration to defaults
+    this.config = {
+      fontSize: null,
+      fontWeight: 900,
+      fontFamily: 'sans-serif',
+      maskBlockSize: 2
+    };
+  }
 }
 
 export default TextRenderer;
