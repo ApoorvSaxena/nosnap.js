@@ -35,57 +35,7 @@ global.cancelAnimationFrame = jest.fn((id) => {
   clearTimeout(id);
 });
 
-// Mock canvas and context
-const createMockCanvas = () => {
-  const mockContext = {
-    scale: jest.fn(),
-    clearRect: jest.fn(),
-    drawImage: jest.fn(),
-    getImageData: jest.fn(() => ({
-      data: new Uint8ClampedArray(4),
-      width: 1,
-      height: 1
-    })),
-    putImageData: jest.fn(),
-    fillRect: jest.fn(),
-    fillText: jest.fn(),
-    measureText: jest.fn(() => ({ width: 100 })),
-    save: jest.fn(),
-    restore: jest.fn(),
-    translate: jest.fn(),
-    rotate: jest.fn(),
-    globalCompositeOperation: 'source-over',
-    imageSmoothingEnabled: true,
-    font: '16px sans-serif',
-    fillStyle: '#000000',
-    textAlign: 'left',
-    textBaseline: 'top'
-  };
-  
-  const canvas = {
-    width: 400,
-    height: 300,
-    style: {
-      width: '400px',
-      height: '300px'
-    },
-    getBoundingClientRect: jest.fn(() => ({
-      width: 400,
-      height: 300,
-      top: 0,
-      left: 0,
-      right: 400,
-      bottom: 300
-    })),
-    getContext: jest.fn(() => mockContext),
-    parentElement: null
-  };
-  
-  // Make it pass instanceof check
-  Object.setPrototypeOf(canvas, HTMLCanvasElement.prototype);
-  
-  return canvas;
-};
+import { createMockCanvas } from './test-utils/canvas-mock.js';
 
 // Mock ResizeObserver for testing
 class MockResizeObserver {
@@ -133,14 +83,20 @@ describe('Responsive Behavior and Resize Handling', () => {
   let mockResizeObserver;
 
   beforeEach(() => {
-    // Create canvas element using mock
-    canvas = createMockCanvas();
+    // Create canvas element using mock with specific dimensions
+    canvas = createMockCanvas({ width: 400, height: 300 });
     
     // Create a parent container
     const container = document.createElement('div');
     container.style.width = '400px';
     container.style.height = '300px';
-    canvas.parentElement = container;
+    
+    // Mock parentElement property
+    Object.defineProperty(canvas, 'parentElement', {
+      value: container,
+      writable: true,
+      configurable: true
+    });
     
     // Mock ResizeObserver
     originalResizeObserver = global.ResizeObserver;
@@ -389,8 +345,8 @@ describe('Responsive Behavior and Resize Handling', () => {
       animatedText.start();
       
       // Mock an error in text mask generation
-      const originalGenerateTextMask = animatedText._generateTextMask;
-      animatedText._generateTextMask = jest.fn(() => {
+      const originalGenerateTextMask = animatedText._generateTextMaskWithErrorHandling;
+      animatedText._generateTextMaskWithErrorHandling = jest.fn(() => {
         throw new Error('Test error during resize');
       });
 

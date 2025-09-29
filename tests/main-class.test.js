@@ -13,18 +13,47 @@ const createMockCanvas = () => {
     clearRect: jest.fn(),
     scale: jest.fn(),
     drawImage: jest.fn(),
-    fillStyle: '',
-    font: '',
-    textAlign: '',
-    textBaseline: '',
-    fillText: jest.fn(),
-    measureText: jest.fn(() => ({ width: 100 })),
-    getImageData: jest.fn(() => ({
+    save: jest.fn(),
+    restore: jest.fn(),
+    translate: jest.fn(),
+    rotate: jest.fn(),
+    transform: jest.fn(),
+    setTransform: jest.fn(),
+    resetTransform: jest.fn(),
+    createImageData: jest.fn(() => ({
       data: new Uint8ClampedArray(800 * 600 * 4),
       width: 800,
       height: 600
     })),
-    imageSmoothingEnabled: true
+    putImageData: jest.fn(),
+    fillStyle: '',
+    strokeStyle: '',
+    globalAlpha: 1,
+    globalCompositeOperation: 'source-over',
+    font: '',
+    textAlign: '',
+    textBaseline: '',
+    fillText: jest.fn(),
+    strokeText: jest.fn(),
+    measureText: jest.fn(() => ({ width: 100 })),
+    getImageData: jest.fn(() => {
+      // Create mock image data with some non-zero alpha values to simulate text
+      const data = new Uint8ClampedArray(800 * 600 * 4);
+      // Add some fake text pixels in the middle
+      for (let i = 100000; i < 100100; i += 4) {
+        data[i + 3] = 255; // Alpha channel
+      }
+      return { data, width: 800, height: 600 };
+    }),
+    imageSmoothingEnabled: true,
+    beginPath: jest.fn(),
+    closePath: jest.fn(),
+    moveTo: jest.fn(),
+    lineTo: jest.fn(),
+    arc: jest.fn(),
+    rect: jest.fn(),
+    fill: jest.fn(),
+    stroke: jest.fn()
   };
 
   const mockCanvas = {
@@ -42,7 +71,10 @@ const createMockCanvas = () => {
       left: 0,
       right: 800,
       bottom: 600
-    }))
+    })),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    parentNode: document.body
   };
 
   // Make it pass instanceof check
@@ -103,11 +135,11 @@ describe('AnimatedNoiseText Main Class', () => {
     test('should throw error with invalid canvas', () => {
       expect(() => {
         new AnimatedNoiseText(null);
-      }).toThrow('AnimatedNoiseText requires a valid HTMLCanvasElement as the first parameter');
+      }).toThrow('AnimatedNoiseText constructor requires a canvas element as the first parameter');
 
       expect(() => {
         new AnimatedNoiseText({});
-      }).toThrow('AnimatedNoiseText requires a valid HTMLCanvasElement as the first parameter');
+      }).toThrow('AnimatedNoiseText requires an HTMLCanvasElement');
     });
 
     test('should initialize all component instances', () => {

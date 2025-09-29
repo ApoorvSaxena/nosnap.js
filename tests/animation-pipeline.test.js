@@ -12,14 +12,35 @@ const createMockCanvas = () => {
     height: 600,
     style: {},
     getBoundingClientRect: () => ({ width: 800, height: 600 }),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    parentNode: document.body,
     getContext: () => ({
+      canvas: null,
       scale: jest.fn(),
       clearRect: jest.fn(),
       drawImage: jest.fn(),
       fillRect: jest.fn(),
       fillText: jest.fn(),
+      strokeText: jest.fn(),
+      save: jest.fn(),
+      restore: jest.fn(),
+      translate: jest.fn(),
+      rotate: jest.fn(),
+      transform: jest.fn(),
+      setTransform: jest.fn(),
+      resetTransform: jest.fn(),
       measureText: () => ({ width: 100 }),
-      getImageData: () => ({
+      getImageData: () => {
+        // Create mock image data with some non-zero alpha values to simulate text
+        const data = new Uint8ClampedArray(800 * 600 * 4);
+        // Add some fake text pixels in the middle
+        for (let i = 100000; i < 100100; i += 4) {
+          data[i + 3] = 255; // Alpha channel
+        }
+        return { data, width: 800, height: 600 };
+      },
+      createImageData: () => ({
         data: new Uint8ClampedArray(800 * 600 * 4),
         width: 800,
         height: 600
@@ -27,10 +48,20 @@ const createMockCanvas = () => {
       putImageData: jest.fn(),
       imageSmoothingEnabled: true,
       globalCompositeOperation: 'source-over',
+      globalAlpha: 1,
       fillStyle: '#000',
+      strokeStyle: '#000',
       font: '900 48px sans-serif',
       textAlign: 'center',
-      textBaseline: 'middle'
+      textBaseline: 'middle',
+      beginPath: jest.fn(),
+      closePath: jest.fn(),
+      moveTo: jest.fn(),
+      lineTo: jest.fn(),
+      arc: jest.fn(),
+      rect: jest.fn(),
+      fill: jest.fn(),
+      stroke: jest.fn()
     })
   };
   
@@ -260,15 +291,16 @@ describe('Animation Rendering Pipeline', () => {
     });
 
     test('should handle animation frame callback', () => {
-      const renderFrameSpy = jest.spyOn(animatedText, '_renderFrame');
+      const renderFrameSpy = jest.spyOn(animatedText, '_renderFrameWithErrorHandling');
       
       animatedText.start();
       
-      // Simulate animation controller calling the callback
+      // Simulate animation controller calling the callback directly
       const callback = animatedText.animationController.animationCallback;
-      if (callback) {
-        callback(10);
-      }
+      expect(callback).toBeDefined();
+      
+      // Call the callback with an offset value
+      callback(10);
       
       expect(renderFrameSpy).toHaveBeenCalledWith(10);
     });

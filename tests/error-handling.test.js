@@ -9,45 +9,7 @@ import NoiseGenerator from '../src/components/NoiseGenerator.js';
 import TextRenderer from '../src/components/TextRenderer.js';
 import AnimationController from '../src/components/AnimationController.js';
 import ConfigManager from '../src/components/ConfigManager.js';
-
-// Mock canvas and context for testing
-const createMockCanvas = (width = 100, height = 100, shouldFailContext = false) => {
-  const mockContext = {
-    scale: jest.fn(),
-    clearRect: jest.fn(),
-    fillRect: jest.fn(),
-    fillText: jest.fn(),
-    measureText: jest.fn(() => ({ width: 50 })),
-    drawImage: jest.fn(),
-    getImageData: jest.fn(() => ({
-      data: new Uint8ClampedArray(width * height * 4),
-      width,
-      height
-    })),
-    save: jest.fn(),
-    restore: jest.fn(),
-    setTransform: jest.fn(),
-    imageSmoothingEnabled: false,
-    fillStyle: '#000',
-    globalCompositeOperation: 'source-over'
-  };
-
-  const canvas = {
-    width,
-    height,
-    style: {},
-    getBoundingClientRect: () => ({ width, height, left: 0, top: 0 }),
-    getContext: jest.fn(() => shouldFailContext ? null : mockContext),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    parentNode: document.body
-  };
-  
-  // Make it instanceof HTMLCanvasElement
-  Object.setPrototypeOf(canvas, HTMLCanvasElement.prototype);
-  
-  return canvas;
-};
+import { createMockCanvas, createFailingMockCanvas } from './test-utils/canvas-mock.js';
 
 // Mock document.createElement for canvas elements
 const originalCreateElement = document.createElement;
@@ -92,8 +54,7 @@ describe('AnimatedNoiseText Constructor Error Handling', () => {
   });
 
   test('should handle canvas context failure', () => {
-    const canvas = createMockCanvas();
-    canvas.getContext = jest.fn(() => null);
+    const canvas = createFailingMockCanvas();
     
     expect(() => {
       new AnimatedNoiseText(canvas);
@@ -115,18 +76,12 @@ describe('AnimatedNoiseText Constructor Error Handling', () => {
     consoleSpy.mockRestore();
   });
 
-  test('should warn about zero-dimension canvas', () => {
-    const canvas = createMockCanvas(0, 0);
+  test('should throw error for zero-dimension canvas', () => {
+    const canvas = createMockCanvas({ width: 0, height: 0 });
     
-    const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
-    
-    new AnimatedNoiseText(canvas);
-    
-    expect(consoleSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Canvas has zero dimensions')
-    );
-    
-    consoleSpy.mockRestore();
+    expect(() => {
+      new AnimatedNoiseText(canvas);
+    }).toThrow('Invalid canvas dimensions: 0x0');
   });
 });
 
@@ -209,8 +164,7 @@ describe('CanvasManager Error Handling', () => {
   });
 
   test('should handle context initialization failure', () => {
-    const canvas = createMockCanvas();
-    canvas.getContext = jest.fn(() => null);
+    const canvas = createFailingMockCanvas();
     
     expect(() => {
       new CanvasManager(canvas);
@@ -218,7 +172,7 @@ describe('CanvasManager Error Handling', () => {
   });
 
   test('should handle invalid canvas dimensions', () => {
-    const canvas = createMockCanvas(-1, -1);
+    const canvas = createMockCanvas({ width: -1, height: -1 });
     
     expect(() => {
       new CanvasManager(canvas);

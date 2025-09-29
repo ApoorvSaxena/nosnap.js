@@ -17,7 +17,47 @@ Object.defineProperty(global, 'window', {
 const createMockCanvas = () => {
   const mockContext = {
     scale: jest.fn(),
-    clearRect: jest.fn()
+    clearRect: jest.fn(),
+    save: jest.fn(),
+    restore: jest.fn(),
+    translate: jest.fn(),
+    rotate: jest.fn(),
+    transform: jest.fn(),
+    setTransform: jest.fn(),
+    resetTransform: jest.fn(),
+    fillRect: jest.fn(),
+    strokeRect: jest.fn(),
+    fillText: jest.fn(),
+    strokeText: jest.fn(),
+    measureText: jest.fn(() => ({ width: 100 })),
+    drawImage: jest.fn(),
+    getImageData: jest.fn(() => ({
+      data: new Uint8ClampedArray(800 * 600 * 4),
+      width: 800,
+      height: 600
+    })),
+    putImageData: jest.fn(),
+    createImageData: jest.fn(() => ({
+      data: new Uint8ClampedArray(800 * 600 * 4),
+      width: 800,
+      height: 600
+    })),
+    beginPath: jest.fn(),
+    closePath: jest.fn(),
+    moveTo: jest.fn(),
+    lineTo: jest.fn(),
+    arc: jest.fn(),
+    rect: jest.fn(),
+    fill: jest.fn(),
+    stroke: jest.fn(),
+    fillStyle: '',
+    strokeStyle: '',
+    globalAlpha: 1,
+    globalCompositeOperation: 'source-over',
+    font: '',
+    textAlign: '',
+    textBaseline: '',
+    imageSmoothingEnabled: true
   };
   
   const canvas = {
@@ -28,7 +68,10 @@ const createMockCanvas = () => {
       width: 800,
       height: 600
     })),
-    getContext: jest.fn(() => mockContext)
+    getContext: jest.fn(() => mockContext),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    parentNode: document.body
   };
   
   // Make it pass instanceof check
@@ -68,14 +111,14 @@ describe('CanvasManager', () => {
     test('should throw error with null canvas', () => {
       expect(() => {
         new CanvasManager(null);
-      }).toThrow('CanvasManager requires a valid HTMLCanvasElement');
+      }).toThrow('CanvasManager: canvas parameter is required');
     });
 
     test('should throw error with non-canvas element', () => {
       const div = document.createElement('div');
       expect(() => {
         new CanvasManager(div);
-      }).toThrow('CanvasManager requires a valid HTMLCanvasElement');
+      }).toThrow('CanvasManager: Expected HTMLCanvasElement');
     });
 
     test('should throw error when canvas context fails', () => {
@@ -84,7 +127,7 @@ describe('CanvasManager', () => {
       
       expect(() => {
         new CanvasManager(badCanvas);
-      }).toThrow('Failed to get 2D rendering context from canvas');
+      }).toThrow('Canvas context initialization failed');
     });
   });
 

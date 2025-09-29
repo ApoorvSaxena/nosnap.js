@@ -168,7 +168,7 @@ class AnimatedNoiseText {
       if (this.canvasManager) {
         this.canvasManager.handleResize((dimensions) => {
           if (!this.isDestroyed) {
-            this._handleResizeWithErrorRecovery(dimensions);
+            this._handleResize(dimensions);
           }
         });
       }
@@ -269,8 +269,9 @@ class AnimatedNoiseText {
   /**
    * Generate text mask with comprehensive error handling
    * @private
+   * @param {boolean} allowFailure - If true, creates fallback on error; if false, re-throws errors
    */
-  _generateTextMaskWithErrorHandling() {
+  _generateTextMaskWithErrorHandling(allowFailure = true) {
     try {
       if (!this.textRenderer) {
         throw new Error('TextRenderer not available for text mask generation');
@@ -299,6 +300,11 @@ class AnimatedNoiseText {
       }
       
     } catch (error) {
+      if (!allowFailure) {
+        // Re-throw error for resize operations to allow proper error handling
+        throw error;
+      }
+      
       // Create fallback empty mask
       console.error('Text mask generation failed, creating fallback:', error.message);
       this.textMask = this._createFallbackTextMask();
@@ -739,6 +745,46 @@ class AnimatedNoiseText {
   }
 
   /**
+   * Resize offscreen canvases with error handling
+   * @private
+   * @param {number} width - New width for offscreen canvases
+   * @param {number} height - New height for offscreen canvases
+   */
+  _resizeOffscreenCanvasesWithErrorHandling(width, height) {
+    try {
+      // Validate dimensions
+      if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+        throw new Error(`Invalid canvas dimensions for resize: ${width}x${height}`);
+      }
+
+      // Resize circle canvas
+      if (this.circleCanvas) {
+        this.circleCanvas.width = width;
+        this.circleCanvas.height = height;
+        this.circleCtx = this.circleCanvas.getContext('2d');
+        
+        if (!this.circleCtx) {
+          throw new Error('Failed to get 2D context for resized circle canvas');
+        }
+      }
+      
+      // Resize composite canvas
+      if (this.compositeCanvas) {
+        this.compositeCanvas.width = width;
+        this.compositeCanvas.height = height;
+        this.compositeCtx = this.compositeCanvas.getContext('2d');
+        
+        if (!this.compositeCtx) {
+          throw new Error('Failed to get 2D context for resized composite canvas');
+        }
+      }
+      
+    } catch (error) {
+      throw new Error(`Offscreen canvas resize failed: ${error.message}`);
+    }
+  }
+
+  /**
    * Handle canvas resize events
    * @private
    * @param {Object} dimensions - New canvas dimensions
@@ -748,37 +794,53 @@ class AnimatedNoiseText {
     
     // Store animation state to ensure smooth continuation (Requirement 4.4)
     const wasRunning = this.isRunning;
-    const currentOffset = this.animationController ? this.animationController.getCurrentOffset() : 0;
     
     try {
       // Temporarily pause animation during resize to prevent rendering issues
-      if (wasRunning) {
+      if (wasRunning && this.animationController) {
         this.animationController.pause();
       }
       
       // Recreate offscreen canvases with new dimensions (Requirement 4.1)
-      this._createOffscreenCanvases(dimensions);
+      this._createOffscreenCanvasesWithErrorHandling(dimensions);
       
       // Regenerate text mask first (Requirement 4.2)
-      this._generateTextMask();
+      this._generateTextMaskWithErrorHandling();
       
       // Then regenerate noise pattern to match text mask dimensions (Requirement 4.2)
-      this._generateNoisePattern();
+      this._generateNoisePatternWithErrorHandling();
       
       // Resume animation if it was running, maintaining smooth continuation
-      if (wasRunning) {
+      if (wasRunning && this.animationController) {
         this.animationController.resume();
       }
       
-    } catch (error) {
-      console.error('Error during resize handling:', error);
+      // Reset error recovery attempts on successful resize
+      this.errorRecoveryAttempts = 0;
       
-      // Attempt to restart animation if it was running
-      if (wasRunning && !this.isRunning) {
-        try {
-          this.start();
-        } catch (restartError) {
-          console.error('Failed to restart animation after resize error:', restartError);
+    } catch (error) {
+      this.errorRecoveryAttempts++;
+      const errorMessage = `Resize handling failed (attempt ${this.errorRecoveryAttempts}): ${error.message}`;
+      console.error('Error during resize handling:', error);
+      this.runtimeErrors.push(errorMessage);
+      
+      // Attempt error recovery if under limit
+      if (this.errorRecoveryAttempts < this.maxRecoveryAttempts) {
+        console.log('Attempting resize error recovery...');
+        setTimeout(() => {
+          if (!this.isDestroyed) {
+            this._attemptResizeRecovery(dimensions, wasRunning);
+          }
+        }, 1000); // Wait 1 second before retry
+      } else {
+        console.error('Maximum resize recovery attempts reached. Animation may be unstable.');
+        // Force restart animation if it was running
+        if (wasRunning && !this.isRunning) {
+          try {
+            this.start();
+          } catch (restartError) {
+            console.error('Failed to restart animation after resize recovery failure:', restartError.message);
+          }
         }
       }
     }

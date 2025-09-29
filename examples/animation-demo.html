@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animated Noise Text - Animation Pipeline Demo</title>
+    <title>Animated Noise Text - Basic Usage Demo</title>
     <style>
         body {
             margin: 0;
@@ -72,16 +72,16 @@
 </head>
 <body>
     <div class="container">
-        <h1>Animated Noise Text - Animation Pipeline Demo</h1>
+        <h1>Animated Noise Text - Basic Usage Demo</h1>
         
         <div class="info">
-            <h3>Animation Rendering Pipeline Features:</h3>
+            <h3>Library Features Demonstrated:</h3>
             <ul>
-                <li><strong>Background Noise Rendering:</strong> Direct noise rendering to main canvas</li>
-                <li><strong>Moving Circle Animation:</strong> Animated noise pattern with vertical scrolling</li>
-                <li><strong>Canvas Compositing:</strong> Efficient offscreen canvas buffer management</li>
-                <li><strong>Text Masking:</strong> Pixelated text mask applied using composite operations</li>
-                <li><strong>Smooth Animation:</strong> RequestAnimationFrame-based animation loop</li>
+                <li><strong>Simple Integration:</strong> Easy setup with minimal configuration</li>
+                <li><strong>Dynamic Text Updates:</strong> Change text content without restarting animation</li>
+                <li><strong>Animation Controls:</strong> Start, stop, and manage animation lifecycle</li>
+                <li><strong>Responsive Design:</strong> Automatically adapts to canvas size changes</li>
+                <li><strong>Error Handling:</strong> Graceful error handling and recovery</li>
             </ul>
         </div>
         
@@ -96,14 +96,24 @@
         <div class="status" id="status">Animation Stopped</div>
         
         <div class="info">
-            <h3>Implementation Details:</h3>
-            <p>This demo showcases the complete animation rendering pipeline implemented in Task 8:</p>
-            <ul>
-                <li><strong>_renderFrame():</strong> Main animation loop that renders background noise and calls the moving circle animation</li>
-                <li><strong>_drawMovingCircle():</strong> Ported from original drawMovingCircle function with proper component integration</li>
-                <li><strong>Offscreen Canvas Management:</strong> Efficient buffer management for circle and composite canvases</li>
-                <li><strong>Smooth Animation:</strong> Uses requestAnimationFrame with configurable step intervals</li>
-            </ul>
+            <h3>Usage Instructions:</h3>
+            <ol>
+                <li><strong>Start Animation:</strong> Click the "Start Animation" button to begin the noise text effect</li>
+                <li><strong>Change Text:</strong> Use the "Change Text" button to cycle through different text examples</li>
+                <li><strong>Stop Animation:</strong> Click "Stop Animation" to pause the effect</li>
+                <li><strong>Responsive:</strong> Resize your browser window to see automatic adaptation</li>
+            </ol>
+            <p><strong>Code Example:</strong></p>
+            <pre><code>import AnimatedNoiseText from 'animated-noise-text';
+
+const canvas = document.getElementById('canvas');
+const animation = new AnimatedNoiseText(canvas, {
+  text: 'HELLO WORLD',
+  cellSize: 2,
+  stepMs: 32
+});
+
+animation.start();</code></pre>
         </div>
     </div>
 

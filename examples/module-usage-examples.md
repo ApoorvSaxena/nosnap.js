@@ -1,15 +1,26 @@
 # Module Usage Examples
 
-This document demonstrates how to use the Animated Noise Text library with different module systems.
+This document demonstrates how to use the Animated Noise Text library with different module systems and environments.
+
+## Table of Contents
+
+- [ES6 Modules (ESM)](#es6-modules-esm)
+- [CommonJS (Node.js)](#commonjs-nodejs)
+- [UMD (Universal Module Definition)](#umd-universal-module-definition)
+- [TypeScript](#typescript)
+- [CDN Usage](#cdn-usage)
+- [Webpack Integration](#webpack-integration)
+- [Rollup Integration](#rollup-integration)
+- [Vite Integration](#vite-integration)
+- [Package.json Configuration](#packagejson-configuration)
 
 ## ES6 Modules (ESM)
 
+### Basic Import
+
 ```javascript
 // Import the main class (default export)
-import AnimatedNoiseText from './dist/animated-noise-text.esm.js';
-
-// Or import named exports
-import { AnimatedNoiseText, CanvasManager, NoiseGenerator } from './dist/animated-noise-text.esm.js';
+import AnimatedNoiseText from 'animated-noise-text';
 
 // Usage
 const canvas = document.getElementById('myCanvas');
@@ -22,25 +33,86 @@ const animation = new AnimatedNoiseText(canvas, {
 animation.start();
 ```
 
+### Named Imports (if available)
+
+```javascript
+// Import named exports for advanced usage
+import { AnimatedNoiseText, CanvasManager, NoiseGenerator } from 'animated-noise-text';
+
+// Use individual components if needed
+const canvasManager = new CanvasManager(canvas);
+const noiseGenerator = new NoiseGenerator(2);
+```
+
+### Dynamic Import
+
+```javascript
+// Lazy loading for better performance
+async function loadAnimation() {
+  const { default: AnimatedNoiseText } = await import('animated-noise-text');
+  
+  const canvas = document.getElementById('myCanvas');
+  const animation = new AnimatedNoiseText(canvas, {
+    text: 'DYNAMIC IMPORT',
+    cellSize: 2
+  });
+  
+  animation.start();
+}
+
+// Load when needed
+document.getElementById('loadBtn').addEventListener('click', loadAnimation);
+```
+
 ## CommonJS (Node.js)
+
+### Basic Require
 
 ```javascript
 // Import the main class (default export)
-const AnimatedNoiseText = require('./dist/animated-noise-text.cjs.js').default;
+const AnimatedNoiseText = require('animated-noise-text').default;
 
-// Or import named exports
-const { AnimatedNoiseText, CanvasManager, NoiseGenerator } = require('./dist/animated-noise-text.cjs.js');
+// Or destructure
+const { default: AnimatedNoiseText } = require('animated-noise-text');
+```
 
-// Usage (in Node.js with canvas library like node-canvas)
+### Node.js with Canvas
+
+```javascript
+// Usage in Node.js with node-canvas
 const { createCanvas } = require('canvas');
-const canvas = createCanvas(800, 600);
+const AnimatedNoiseText = require('animated-noise-text').default;
 
+const canvas = createCanvas(800, 600);
 const animation = new AnimatedNoiseText(canvas, {
   text: 'NODE.JS',
   cellSize: 2
 });
 
-animation.start();
+// Note: Animation won't run in Node.js without DOM APIs
+// This is mainly for server-side rendering or testing
+```
+
+### Express.js Integration
+
+```javascript
+const express = require('express');
+const { createCanvas } = require('canvas');
+const AnimatedNoiseText = require('animated-noise-text').default;
+
+const app = express();
+
+app.get('/generate-text-image', (req, res) => {
+  const canvas = createCanvas(800, 400);
+  const animation = new AnimatedNoiseText(canvas, {
+    text: req.query.text || 'SERVER',
+    cellSize: 3
+  });
+  
+  // Generate static frame (animation won't work server-side)
+  const buffer = canvas.toBuffer('image/png');
+  res.type('png').send(buffer);
+});
 ```
 
 ## UMD (Universal Module Definition)
@@ -57,18 +129,15 @@ animation.start();
   <canvas id="myCanvas" width="800" height="600"></canvas>
   
   <!-- Load the UMD build -->
-  <script src="./dist/animated-noise-text.umd.js"></script>
+  <script src="https://unpkg.com/animated-noise-text/dist/animated-noise-text.umd.min.js"></script>
   
   <script>
     // Access via global namespace
     const canvas = document.getElementById('myCanvas');
-    const animation = new AnimatedNoiseText.default(canvas, {
+    const animation = new AnimatedNoiseText(canvas, {
       text: 'UMD GLOBAL',
       cellSize: 4
     });
-    
-    // Or use named exports
-    const { CanvasManager, NoiseGenerator } = AnimatedNoiseText;
     
     animation.start();
   </script>
@@ -79,9 +148,17 @@ animation.start();
 ### AMD (RequireJS)
 
 ```javascript
-require(['./dist/animated-noise-text.umd.js'], function(AnimatedNoiseText) {
+// Configure RequireJS
+require.config({
+  paths: {
+    'animated-noise-text': 'https://unpkg.com/animated-noise-text/dist/animated-noise-text.umd'
+  }
+});
+
+// Use with RequireJS
+require(['animated-noise-text'], function(AnimatedNoiseText) {
   const canvas = document.getElementById('myCanvas');
-  const animation = new AnimatedNoiseText.default(canvas, {
+  const animation = new AnimatedNoiseText(canvas, {
     text: 'AMD MODULE',
     cellSize: 2
   });
@@ -92,21 +169,19 @@ require(['./dist/animated-noise-text.umd.js'], function(AnimatedNoiseText) {
 
 ## TypeScript
 
-```typescript
-// Import with full type support
-import AnimatedNoiseText, { 
-  AnimatedNoiseTextConfig, 
-  CanvasManager, 
-  NoiseGenerator 
-} from './dist/animated-noise-text.esm.js';
+### Basic TypeScript Usage
 
-// Configuration with type checking
+```typescript
+import AnimatedNoiseText, { AnimatedNoiseTextConfig } from 'animated-noise-text';
+
+// Configuration with full type checking
 const config: AnimatedNoiseTextConfig = {
   text: 'TYPESCRIPT',
   cellSize: 3,
   stepMs: 40,
   fontSize: 48,
-  fontWeight: 'bold'
+  fontWeight: 'bold',
+  fontFamily: 'Arial, sans-serif'
 };
 
 const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
@@ -118,12 +193,219 @@ animation.setText('NEW TEXT');
 animation.updateConfig({ cellSize: 5 });
 ```
 
+### Advanced TypeScript with Interfaces
+
+```typescript
+import AnimatedNoiseText, { 
+  AnimatedNoiseTextConfig,
+  AnimationState,
+  ErrorHandler 
+} from 'animated-noise-text';
+
+interface CustomAnimationConfig extends AnimatedNoiseTextConfig {
+  customProperty?: string;
+}
+
+class AnimationManager {
+  private animations: Map<string, AnimatedNoiseText> = new Map();
+  
+  createAnimation(id: string, canvas: HTMLCanvasElement, config: CustomAnimationConfig): void {
+    const animation = new AnimatedNoiseText(canvas, config);
+    this.animations.set(id, animation);
+  }
+  
+  startAnimation(id: string): void {
+    const animation = this.animations.get(id);
+    if (animation) {
+      animation.start();
+    }
+  }
+  
+  destroyAll(): void {
+    this.animations.forEach(animation => animation.destroy());
+    this.animations.clear();
+  }
+}
+```
+
+## CDN Usage
+
+### Unpkg
+
+```html
+<!-- ES Module from CDN -->
+<script type="module">
+  import AnimatedNoiseText from 'https://unpkg.com/animated-noise-text/dist/animated-noise-text.esm.js';
+  
+  const canvas = document.getElementById('canvas');
+  const animation = new AnimatedNoiseText(canvas, { text: 'CDN DEMO' });
+  animation.start();
+</script>
+
+<!-- UMD from CDN -->
+<script src="https://unpkg.com/animated-noise-text/dist/animated-noise-text.umd.min.js"></script>
+<script>
+  const animation = new AnimatedNoiseText(canvas, { text: 'UMD CDN' });
+  animation.start();
+</script>
+```
+
+### jsDelivr
+
+```html
+<!-- ES Module -->
+<script type="module">
+  import AnimatedNoiseText from 'https://cdn.jsdelivr.net/npm/animated-noise-text/dist/animated-noise-text.esm.js';
+</script>
+
+<!-- UMD -->
+<script src="https://cdn.jsdelivr.net/npm/animated-noise-text/dist/animated-noise-text.umd.min.js"></script>
+```
+
+## Webpack Integration
+
+### webpack.config.js
+
+```javascript
+const path = require('path');
+
+module.exports = {
+  entry: './src/index.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js'
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env']
+          }
+        }
+      }
+    ]
+  },
+  resolve: {
+    alias: {
+      'animated-noise-text': path.resolve(__dirname, 'node_modules/animated-noise-text/dist/animated-noise-text.esm.js')
+    }
+  }
+};
+```
+
+### Usage in Webpack Project
+
+```javascript
+// src/index.js
+import AnimatedNoiseText from 'animated-noise-text';
+
+const canvas = document.getElementById('canvas');
+const animation = new AnimatedNoiseText(canvas, {
+  text: 'WEBPACK BUILD',
+  cellSize: 2
+});
+
+animation.start();
+```
+
+## Rollup Integration
+
+### rollup.config.js
+
+```javascript
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import { terser } from 'rollup-plugin-terser';
+
+export default {
+  input: 'src/main.js',
+  output: {
+    file: 'dist/bundle.js',
+    format: 'iife',
+    name: 'MyApp'
+  },
+  plugins: [
+    resolve(),
+    commonjs(),
+    terser()
+  ]
+};
+```
+
+### Usage in Rollup Project
+
+```javascript
+// src/main.js
+import AnimatedNoiseText from 'animated-noise-text';
+
+export function initAnimation(canvasId) {
+  const canvas = document.getElementById(canvasId);
+  const animation = new AnimatedNoiseText(canvas, {
+    text: 'ROLLUP BUILD',
+    cellSize: 2
+  });
+  
+  return animation;
+}
+```
+
+## Vite Integration
+
+### vite.config.js
+
+```javascript
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  build: {
+    lib: {
+      entry: 'src/main.js',
+      name: 'MyApp',
+      fileName: 'my-app'
+    }
+  },
+  optimizeDeps: {
+    include: ['animated-noise-text']
+  }
+});
+```
+
+### Usage in Vite Project
+
+```javascript
+// src/main.js
+import AnimatedNoiseText from 'animated-noise-text';
+
+const canvas = document.querySelector('#canvas');
+const animation = new AnimatedNoiseText(canvas, {
+  text: 'VITE BUILD',
+  cellSize: 2,
+  stepMs: 32
+});
+
+// Hot module replacement support
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => {
+    animation.destroy();
+  });
+}
+
+animation.start();
+```
+
 ## Package.json Configuration
 
 The library supports proper module resolution through package.json exports:
 
 ```json
 {
+  "name": "animated-noise-text",
+  "version": "1.0.0",
+  "description": "A JavaScript library for creating animated noise text effects",
   "main": "dist/animated-noise-text.cjs.js",
   "module": "dist/animated-noise-text.esm.js",
   "browser": "dist/animated-noise-text.umd.js",
@@ -135,22 +417,60 @@ The library supports proper module resolution through package.json exports:
       "browser": "./dist/animated-noise-text.umd.js",
       "types": "./dist/animated-noise-text.d.ts"
     }
-  }
+  },
+  "files": [
+    "dist/",
+    "src/",
+    "README.md"
+  ]
 }
 ```
 
-This ensures that:
-- Node.js uses the CommonJS build by default
-- Bundlers like Webpack/Rollup prefer the ES module build
-- Browsers can use the UMD build
-- TypeScript gets proper type definitions
+### Module Resolution Benefits
 
-## Build Sizes
+This configuration ensures that:
+- **Node.js** uses the CommonJS build by default (`main` field)
+- **Bundlers** like Webpack/Rollup prefer the ES module build (`module` field)
+- **Browsers** can use the UMD build (`browser` field)
+- **TypeScript** gets proper type definitions (`types` field)
+- **Modern tools** use the `exports` field for precise resolution
 
-- **ESM**: ~43.2 KB (unminified)
-- **CommonJS**: ~43.3 KB (unminified)  
-- **UMD**: ~43.5 KB (unminified)
-- **UMD Minified**: ~39.6 KB (production-ready)
-- **TypeScript Declarations**: ~5.9 KB
+## Build Sizes and Performance
 
-All builds include source maps for debugging.
+| Format | Size (Unminified) | Size (Minified) | Gzipped |
+|--------|------------------|-----------------|---------|
+| ESM | ~43.2 KB | ~39.1 KB | ~12.8 KB |
+| CommonJS | ~43.3 KB | ~39.2 KB | ~12.9 KB |
+| UMD | ~43.5 KB | ~39.6 KB | ~13.1 KB |
+| TypeScript Declarations | ~5.9 KB | N/A | ~1.8 KB |
+
+### Performance Recommendations
+
+1. **Use ES Modules** when possible for better tree-shaking
+2. **Use UMD minified** for direct browser usage
+3. **Enable gzip compression** on your server for optimal delivery
+4. **Consider dynamic imports** for code splitting in large applications
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Module not found**: Ensure the package is installed and the import path is correct
+2. **TypeScript errors**: Make sure `@types/node` is installed if using Node.js APIs
+3. **Canvas not found**: Ensure the canvas element exists before creating the animation
+4. **Build errors**: Check that your bundler supports the module format you're using
+
+### Debug Mode
+
+```javascript
+// Enable debug logging
+const animation = new AnimatedNoiseText(canvas, {
+  text: 'DEBUG MODE',
+  debug: true // If supported
+});
+
+// Check for errors
+if (animation.initializationErrors?.length > 0) {
+  console.warn('Initialization warnings:', animation.initializationErrors);
+}
+```

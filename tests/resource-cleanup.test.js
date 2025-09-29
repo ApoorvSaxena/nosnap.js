@@ -5,57 +5,9 @@
 
 import AnimatedNoiseText from '../src/index.js';
 import AnimationController from '../src/components/AnimationController.js';
-import CanvasManager from '../src/components/CanvasManager.js';
 import TextRenderer from '../src/components/TextRenderer.js';
 import NoiseGenerator from '../src/components/NoiseGenerator.js';
-
-// Mock canvas and context for testing
-const createMockCanvas = () => {
-  const mockContext = {
-    canvas: null,
-    fillRect: jest.fn(),
-    clearRect: jest.fn(),
-    scale: jest.fn(),
-    drawImage: jest.fn(),
-    fillStyle: '',
-    font: '',
-    textAlign: '',
-    textBaseline: '',
-    fillText: jest.fn(),
-    measureText: jest.fn(() => ({ width: 100 })),
-    getImageData: jest.fn(() => ({
-      data: new Uint8ClampedArray(800 * 600 * 4),
-      width: 800,
-      height: 600
-    })),
-    imageSmoothingEnabled: true,
-    globalCompositeOperation: 'source-over'
-  };
-
-  const mockCanvas = {
-    width: 800,
-    height: 600,
-    style: {
-      width: '800px',
-      height: '600px'
-    },
-    getContext: jest.fn(() => mockContext),
-    getBoundingClientRect: jest.fn(() => ({
-      width: 800,
-      height: 600,
-      top: 0,
-      left: 0,
-      right: 800,
-      bottom: 600
-    }))
-  };
-
-  // Make it pass instanceof check
-  Object.setPrototypeOf(mockCanvas, HTMLCanvasElement.prototype);
-  mockContext.canvas = mockCanvas;
-
-  return mockCanvas;
-};
+import { createMockCanvas } from './test-utils/canvas-mock.js';
 
 // Mock document.createElement to return our mock canvas
 const originalCreateElement = document.createElement;
