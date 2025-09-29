@@ -8,7 +8,7 @@
 // import NoiseGenerator from './components/NoiseGenerator.js';
 // import TextRenderer from './components/TextRenderer.js';
 // import AnimationController from './components/AnimationController.js';
-// import ConfigManager from './components/ConfigManager.js';
+import ConfigManager from './components/ConfigManager.js';
 
 /**
  * Main AnimatedNoiseText class
@@ -16,10 +16,23 @@
  */
 class AnimatedNoiseText {
   constructor(canvas, options = {}) {
-    // Placeholder implementation - will be completed in later tasks
+    // Initialize configuration manager
+    this.configManager = new ConfigManager();
+    
+    // Validate and merge configuration
+    const configResult = this.configManager.createConfig(options);
+    this.config = configResult.config;
+    
+    // Log warnings if any configuration issues were found
+    if (configResult.warnings.length > 0) {
+      console.warn('AnimatedNoiseText configuration warnings:', configResult.warnings);
+    }
+    
+    // Store canvas reference
     this.canvas = canvas;
-    this.options = options;
     this.isRunning = false;
+    
+    // Placeholder for other components - will be completed in later tasks
   }
 
   /**
@@ -51,8 +64,11 @@ class AnimatedNoiseText {
    * @param {string} text - New text to display
    */
   setText(text) {
-    // To be implemented in later tasks
-    this.options.text = text;
+    // Update configuration with new text
+    this.updateConfig({ text });
+    
+    // TODO: Trigger text mask regeneration
+    // This will be implemented in later tasks when TextRenderer is available
   }
 
   /**
@@ -60,8 +76,19 @@ class AnimatedNoiseText {
    * @param {Object} newOptions - New configuration options
    */
   updateConfig(newOptions) {
-    // To be implemented in later tasks
-    this.options = { ...this.options, ...newOptions };
+    // Merge new options with existing configuration
+    const mergedOptions = { ...this.config, ...newOptions };
+    const configResult = this.configManager.createConfig(mergedOptions);
+    
+    this.config = configResult.config;
+    
+    // Log warnings if any configuration issues were found
+    if (configResult.warnings.length > 0) {
+      console.warn('AnimatedNoiseText configuration warnings:', configResult.warnings);
+    }
+    
+    // TODO: Trigger re-initialization of components that depend on config
+    // This will be implemented in later tasks when other components are available
   }
 }
 
