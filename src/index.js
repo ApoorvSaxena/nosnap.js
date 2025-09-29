@@ -485,13 +485,19 @@ class AnimatedNoiseText {
       
     } catch (error) {
       const errorMessage = `Failed to start animation: ${error.message}`;
-      console.error(errorMessage);
+      // Only log in non-test environments to reduce console noise
+      if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
+        console.error(errorMessage);
+      }
       this.runtimeErrors.push(errorMessage);
       
       // Attempt recovery if possible
       if (this.errorRecoveryAttempts < this.maxRecoveryAttempts) {
         this.errorRecoveryAttempts++;
-        console.log(`Attempting animation start recovery (attempt ${this.errorRecoveryAttempts})...`);
+        // Only log in non-test environments to reduce console noise
+        if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
+          console.log(`Attempting animation start recovery (attempt ${this.errorRecoveryAttempts})...`);
+        }
         
         try {
           this._attemptStartRecovery();

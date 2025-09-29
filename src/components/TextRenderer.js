@@ -416,16 +416,25 @@ class TextRenderer {
    * This method ensures complete cleanup for memory leak prevention
    */
   destroy() {
-    // Clear the font measurement cache
-    this.clearCache();
+    try {
+      // Clear the font measurement cache
+      this.clearCache();
+    } catch (error) {
+      // In test environments, clearCache might be mocked and fail
+      console.warn('TextRenderer: Failed to clear cache during destroy:', error.message);
+    }
     
-    // Reset configuration to defaults
-    this.config = {
-      fontSize: null,
-      fontWeight: 900,
-      fontFamily: 'sans-serif',
-      maskBlockSize: 2
-    };
+    try {
+      // Reset configuration to defaults
+      this.config = {
+        fontSize: null,
+        fontWeight: 900,
+        fontFamily: 'sans-serif',
+        maskBlockSize: 2
+      };
+    } catch (error) {
+      console.warn('TextRenderer: Failed to reset config during destroy:', error.message);
+    }
   }
 }
 

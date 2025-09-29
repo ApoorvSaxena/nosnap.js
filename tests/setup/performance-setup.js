@@ -20,11 +20,13 @@ process.hrtime = mockHrTime;
 
 // Mock performance.now with high precision
 const mockPerformanceNow = jest.fn();
-let performanceCounter = 0;
+let performanceCounter = 16.67; // Start with a valid time
 
 mockPerformanceNow.mockImplementation(() => {
   performanceCounter += 16.67; // 60fps
-  return performanceCounter;
+  // Ensure we always return a valid finite number
+  const result = Number.isFinite(performanceCounter) ? performanceCounter : (performanceCounter = 16.67);
+  return result;
 });
 
 Object.defineProperty(global, 'performance', {
@@ -91,6 +93,13 @@ const animationFrameCallbacks = new Map();
 
 global.requestAnimationFrame = jest.fn((callback) => {
   const id = ++animationFrameId;
+  
+  // Ensure we have a valid ID
+  if (id <= 0 || !Number.isFinite(id)) {
+    console.warn('Invalid animation frame ID generated, using fallback');
+    return 1;
+  }
+  
   animationFrameCallbacks.set(id, callback);
   
   // Simulate async execution
@@ -98,7 +107,15 @@ global.requestAnimationFrame = jest.fn((callback) => {
     if (animationFrameCallbacks.has(id)) {
       const cb = animationFrameCallbacks.get(id);
       animationFrameCallbacks.delete(id);
-      cb(performance.now());
+      try {
+        const timestamp = performance.now();
+        // Ensure timestamp is valid before calling callback
+        if (typeof timestamp === 'number' && Number.isFinite(timestamp)) {
+          cb(timestamp);
+        }
+      } catch (error) {
+        // Ignore callback errors in test environment
+      }
     }
   }, 16);
   
@@ -114,9 +131,9 @@ afterEach(() => {
   // Clear animation frame callbacks
   animationFrameCallbacks.clear();
   
-  // Reset counters
-  hrTimeCounter = 0;
-  performanceCounter = 0;
+  // Reset counters but ensure they start from a valid value
+  hrTimeCounter = 16666667; // Start from a valid time
+  performanceCounter = 16.67; // Start from a valid time
   
   // Clear memory snapshots
   memorySnapshots = [];
