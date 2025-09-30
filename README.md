@@ -270,10 +270,10 @@ const qualityAnimation = new NoSnap(canvas, {
 
 ## Examples & Demos
 
-- [Basic Usage Demo](examples/animation-demo.html)
-- [Dynamic Text Demo](examples/dynamic-text-demo.html)
-- [Framework Integration Examples](examples/frameworks/)
-- [Module Usage Examples](examples/module-usage-examples.md)
+- [📋 Examples Index](examples/) - Browse all available examples
+- [🚀 Local Development Example](examples/local-dev-example.html) - Interactive demo with controls
+- [📦 Module Usage Examples](examples/module-usage-examples.md) - Different module systems
+- [⚛️ Framework Integration Examples](examples/frameworks/) - React, Vue, etc.
 
 ## Development
 
@@ -289,6 +289,58 @@ npm test
 
 # Watch mode for development
 npm run build:watch
+
+# Start development server for examples
+npm run dev
+
+# Or just serve files (after building)
+npm run serve
+```
+
+### Local Development Server
+
+The project includes a development server to easily test examples locally:
+
+```bash
+# Build and start server
+npm run dev
+```
+
+This will:
+1. Build the library in development mode
+2. Start a local HTTP server on `http://localhost:8080`
+3. Enable CORS for cross-origin requests
+4. Disable caching for development
+
+You can then access examples at:
+- `http://localhost:8080/examples/`
+- `http://localhost:8080/docs/`
+
+### Example Usage in Development
+
+Create an HTML file in the `examples/` directory:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NoSnap.js Local Example</title>
+</head>
+<body>
+  <canvas id="canvas" width="800" height="400"></canvas>
+  
+  <!-- Use local build -->
+  <script src="../dist/nosnap.umd.js"></script>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const animation = new NoSnap(canvas, {
+      text: 'LOCAL DEV',
+      cellSize: 2
+    });
+    animation.start();
+  </script>
+</body>
+</html>
 ```
 
 ## Contributing

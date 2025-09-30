@@ -231,7 +231,9 @@ class TextRenderer {
 
     // Handle special characters and normalize text
     try {
-      processedText = processedText.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, ''); // Remove control characters except \n
+      // Remove control characters except \n
+      // eslint-disable-next-line no-control-regex
+      processedText = processedText.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '');
     } catch (error) {
       console.warn('Text normalization failed, using original text:', error.message);
     }

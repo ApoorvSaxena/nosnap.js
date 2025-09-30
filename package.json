@@ -17,6 +17,9 @@
   "files": [
     "dist/",
     "src/",
+    "examples/",
+    "docs/",
+    "scripts/",
     "README.md"
   ],
   "scripts": {
@@ -38,6 +41,9 @@
     "test:dynamic": "jest --testPathPattern=\"dynamic-text-update\" --verbose",
     "test:coverage": "jest --coverage --verbose",
     "test:ci": "jest --coverage --ci --watchAll=false --maxWorkers=2",
+    "dev": "npm run build:dev && npm run serve",
+    "serve": "npx http-server . -p 8080 -c-1 --cors",
+    "check-server": "node scripts/check-server.js",
     "lint": "eslint src/**/*.js",
     "clean": "rimraf dist/*",
     "prepublishOnly": "npm run clean && npm run build",
@@ -69,6 +75,7 @@
     "@rollup/plugin-terser": "^0.4.0",
     "babel-jest": "^29.0.0",
     "eslint": "^8.0.0",
+    "http-server": "^14.1.1",
     "jest": "^29.0.0",
     "jest-environment-jsdom": "^29.0.0",
     "rimraf": "^5.0.0",
