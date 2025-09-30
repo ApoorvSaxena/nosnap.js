@@ -129,7 +129,7 @@ app.get('/generate-text-image', (req, res) => {
   <canvas id="myCanvas" width="800" height="600"></canvas>
   
   <!-- Load the UMD build -->
-  <script src="https://unpkg.com/nosnap.js/dist/nosnap.js.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/nosnap.js/dist/nosnap.js.umd.min.js"></script>
   
   <script>
     // Access via global namespace
@@ -151,7 +151,7 @@ app.get('/generate-text-image', (req, res) => {
 // Configure RequireJS
 require.config({
   paths: {
-    'nosnap.js': 'https://unpkg.com/nosnap.js/dist/nosnap.js.umd'
+    'nosnap.js': 'https://cdn.jsdelivr.net/npm/nosnap.js/dist/nosnap.js.umd'
   }
 });
 
@@ -230,12 +230,12 @@ class AnimationManager {
 
 ## CDN Usage
 
-### Unpkg
+### jsDelivr
 
 ```html
 <!-- ES Module from CDN -->
 <script type="module">
-  import NoSnap from 'https://unpkg.com/nosnap.js/dist/nosnap.js.esm.js';
+  import NoSnap from 'https://cdn.jsdelivr.net/npm/nosnap.js/dist/nosnap.js.esm.js';
   
   const canvas = document.getElementById('canvas');
   const animation = new NoSnap(canvas, { text: 'CDN DEMO' });
@@ -243,23 +243,23 @@ class AnimationManager {
 </script>
 
 <!-- UMD from CDN -->
-<script src="https://unpkg.com/nosnap.js/dist/nosnap.js.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/nosnap.js/dist/nosnap.js.umd.min.js"></script>
 <script>
   const animation = new NoSnap(canvas, { text: 'UMD CDN' });
   animation.start();
 </script>
 ```
 
-### jsDelivr
+### Unpkg (Alternative)
 
 ```html
 <!-- ES Module -->
 <script type="module">
-  import NoSnap from 'https://cdn.jsdelivr.net/npm/nosnap.js/dist/nosnap.js.esm.js';
+  import NoSnap from 'https://unpkg.com/nosnap.js/dist/nosnap.js.esm.js';
 </script>
 
 <!-- UMD -->
-<script src="https://cdn.jsdelivr.net/npm/nosnap.js/dist/nosnap.js.umd.min.js"></script>
+<script src="https://unpkg.com/nosnap.js/dist/nosnap.js.umd.min.js"></script>
 ```
 
 ## Webpack Integration

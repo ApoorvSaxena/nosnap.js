@@ -28,11 +28,11 @@ npm install nosnap.js
 ```html
 <!-- ES Module -->
 <script type="module">
-  import NoSnap from 'https://unpkg.com/nosnap.js/dist/nosnap.esm.js';
+  import NoSnap from 'https://cdn.jsdelivr.net/npm/nosnap.js/dist/nosnap.esm.js';
 </script>
 
 <!-- UMD (Global) -->
-<script src="https://unpkg.com/nosnap.js/dist/nosnap.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/nosnap.js/dist/nosnap.umd.min.js"></script>
 ```
 
 ## Quick Start
