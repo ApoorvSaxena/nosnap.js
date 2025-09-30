@@ -351,6 +351,10 @@ Create an HTML file in the `examples/` directory:
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+## Credits
+
+Hacker News [submission](https://news.ycombinator.com/item?id=45284311)
+
 ## License
 
 MIT License - see the [LICENSE](LICENSE) file for details.
