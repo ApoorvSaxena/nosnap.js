@@ -1,5 +1,9 @@
 # nosnap.js
 
+<div align="center">
+  <img src="assets/icons/icon-128.png" alt="NoSnap.js Logo" width="64" height="64">
+</div>
+
 A JavaScript library for creating animated noise text effects on HTML5 canvas. Transform your text into dynamic, animated noise patterns with smooth transitions and responsive behavior.
 
 ![Animated Noise Text Demo](https://via.placeholder.com/800x400/000000/FFFFFF?text=ANIMATED+NOISE+TEXT)
