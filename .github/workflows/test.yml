@@ -196,10 +196,11 @@ jobs:
       
     - name: Test built files exist
       run: |
-        test -f dist/animated-noise-text.cjs.js
-        test -f dist/animated-noise-text.esm.js
-        test -f dist/animated-noise-text.umd.js
-        test -f dist/animated-noise-text.d.ts
+        test -f dist/nosnap.cjs.js
+        test -f dist/nosnap.esm.js
+        test -f dist/nosnap.umd.js
+        test -f dist/nosnap.umd.min.js
+        test -f dist/nosnap.d.ts
         
     - name: Test file sizes
       run: |

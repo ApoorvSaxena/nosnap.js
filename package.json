@@ -26,7 +26,7 @@
     "build": "npm run clean && npm run build:types && npm run build:dev && npm run build:prod",
     "build:dev": "rollup -c",
     "build:prod": "NODE_ENV=production rollup -c",
-    "build:types": "node -e \"console.log('TypeScript declarations preserved')\"",
+    "build:types": "node scripts/build-types.js",
     "build:watch": "rollup -c --watch",
     "test": "jest",
     "test:watch": "jest --watch",
