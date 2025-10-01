@@ -3,7 +3,7 @@
 const http = require('http');
 const path = require('path');
 
-const PORT = 8080;
+const PORT = 3000;
 const HOST = 'localhost';
 
 function checkServer() {

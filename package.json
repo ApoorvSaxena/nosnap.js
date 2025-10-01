@@ -42,7 +42,7 @@
     "test:coverage": "jest --coverage --verbose",
     "test:ci": "jest --coverage --ci --watchAll=false --maxWorkers=2",
     "dev": "npm run build:dev && npm run serve",
-    "serve": "npx http-server . -p 8080 -c-1 --cors",
+    "serve": "npx http-server . -p 3000 -c-1 --cors",
     "check-server": "node scripts/check-server.js",
     "lint": "eslint src/**/*.js",
     "clean": "rimraf dist/*",

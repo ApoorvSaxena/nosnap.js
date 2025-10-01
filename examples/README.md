@@ -14,7 +14,7 @@ npm install
 npm run dev
 ```
 
-Then open your browser to `http://localhost:8080/examples/`
+Then open your browser to `http://localhost:3000/examples/`
 
 ## Available Examples
 
@@ -96,7 +96,7 @@ npm run check-server
 ## Troubleshooting
 
 ### Server Won't Start
-- Make sure port 8080 is available
+- Make sure port 3000 is available
 - Check that dependencies are installed: `npm install`
 - Try building first: `npm run build:dev`
 

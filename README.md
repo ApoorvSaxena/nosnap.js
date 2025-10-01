@@ -308,13 +308,13 @@ npm run dev
 
 This will:
 1. Build the library in development mode
-2. Start a local HTTP server on `http://localhost:8080`
+2. Start a local HTTP server on `http://localhost:3000`
 3. Enable CORS for cross-origin requests
 4. Disable caching for development
 
 You can then access examples at:
-- `http://localhost:8080/examples/`
-- `http://localhost:8080/docs/`
+- `http://localhost:3000/examples/`
+- `http://localhost:3000/docs/`
 
 ### Example Usage in Development
 
