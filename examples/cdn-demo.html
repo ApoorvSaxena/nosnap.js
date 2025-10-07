@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NoSnap.js - CDN Demo</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/icon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../assets/icons/icon-16.png">
+  <link rel="apple-touch-icon" sizes="128x128" href="../assets/icons/icon-128.png">
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    
+    h1 {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    canvas {
+      border: 1px solid #333;
+      margin: 20px 0;
+      background: #000;
+      width: 800px !important;
+      height: 400px !important;
+      max-width: 800px;
+      max-height: 400px;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    button {
+      padding: 10px 20px;
+      background: #333;
+      color: #fff;
+      border: 1px solid #555;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    
+    button:hover {
+      background: #555;
+    }
+    
+    input {
+      padding: 8px;
+      background: #333;
+      color: #fff;
+      border: 1px solid #555;
+      border-radius: 4px;
+    }
+    
+    .info {
+      max-width: 600px;
+      text-align: center;
+      margin-top: 20px;
+      color: #ccc;
+      line-height: 1.5;
+    }
+    
+    .cdn-info {
+      background: rgba(0, 255, 0, 0.1);
+      border: 1px solid #0f0;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div style="text-align: center; margin-bottom: 20px;">
+    <img src="../assets/icons/icon-32.png" alt="NoSnap.js Logo" style="vertical-align: middle; margin-right: 12px;">
+    <h1 style="display: inline-block; vertical-align: middle; margin: 0;">NoSnap.js - CDN Demo</h1>
+  </div>
+  
+  <div class="cdn-info">
+    <strong>🌐 Loading from CDN:</strong> https://cdn.jsdelivr.net/npm/nosnap.js/dist/nosnap.umd.min.js
+  </div>
+  
+  <canvas id="canvas" width="800" height="400"></canvas>
+  
+  <div class="controls">
+    <button onclick="animation.start()">Start</button>
+    <button onclick="animation.stop()">Stop</button>
+    <input type="text" id="textInput" placeholder="Enter text" value="CDN DEMO">
+    <button onclick="updateText()">Update Text</button>
+    <button onclick="randomizeConfig()">Randomize</button>
+  </div>
+  
+  <div class="info">
+    <p>This example demonstrates NoSnap.js loaded directly from the jsdelivr CDN.</p>
+    <p>No local build or development server required - perfect for quick testing and integration.</p>
+    <p><strong>CDN URL:</strong> <span id="cdnInfo">https://cdn.jsdelivr.net/npm/nosnap.js/dist/nosnap.umd.min.js</span></p>
+  </div>
+
+  <!-- Load from jsdelivr CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/nosnap.js/dist/nosnap.umd.min.js"></script>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const textInput = document.getElementById('textInput');
+    
+    // Create animation instance
+    let animation = new NoSnap.NoSnap(canvas, {
+      text: 'CDN DEMO',
+      cellSize: 2,
+      stepMs: 32
+    });
+    
+    // Start animation
+    animation.start();
+    
+    // Update text function
+    function updateText() {
+      const newText = textInput.value || 'EMPTY';
+      animation.setText(newText);
+    }
+    
+    // Randomize configuration
+    function randomizeConfig() {
+      const configs = [
+        { cellSize: 1, stepMs: 16, text: 'HIGH QUALITY' },
+        { cellSize: 3, stepMs: 50, text: 'BALANCED' },
+        { cellSize: 5, stepMs: 80, text: 'PERFORMANCE' },
+        { cellSize: 2, stepMs: 32, text: 'DEFAULT' }
+      ];
+      
+      const config = configs[Math.floor(Math.random() * configs.length)];
+      animation.updateConfig(config);
+      textInput.value = config.text;
+    }
+    
+    // Handle Enter key in text input
+    textInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        updateText();
+      }
+    });
+    
+    // Handle page visibility for performance
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        animation.stop();
+      } else {
+        animation.start();
+      }
+    });
+  </script>
+</body>
+</html>
