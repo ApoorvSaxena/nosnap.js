@@ -1,4 +1,4 @@
-# nosnap.js
+# nosnap.js [![npm version](https://badge.fury.io/js/nosnap.js.svg)](https://badge.fury.io/js/nosnap.js) [![npm](https://img.shields.io/npm/dm/nosnap.js)](https://www.npmjs.com/package/nosnap.js) [![](https://data.jsdelivr.com/v1/package/npm/nosnap.js/badge)](https://www.jsdelivr.com/package/npm/nosnap.js)
 
 <div align="center">
   <img src="assets/icons/icon-128.png" alt="NoSnap.js Logo">
