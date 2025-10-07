@@ -106,10 +106,11 @@
                 <li><strong>Responsive:</strong> Resize your browser window to see automatic adaptation</li>
             </ol>
             <p><strong>Code Example:</strong></p>
-            <pre><code>import AnimatedNoiseText from 'animated-noise-text';
+            <pre><code>// Load from CDN
+&lt;script src="https://cdn.jsdelivr.net/npm/nosnap.js/dist/nosnap.umd.min.js"&gt;&lt;/script&gt;
 
 const canvas = document.getElementById('canvas');
-const animation = new AnimatedNoiseText(canvas, {
+const animation = new NoSnap.NoSnap(canvas, {
   text: 'HELLO WORLD',
   cellSize: 2,
   stepMs: 32
@@ -119,8 +120,8 @@ animation.start();</code></pre>
         </div>
     </div>
 
-    <script type="module">
-        import AnimatedNoiseText from '../src/index.js';
+    <script src="https://cdn.jsdelivr.net/npm/nosnap.js/dist/nosnap.umd.min.js"></script>
+    <script>
 
         const canvas = document.getElementById('demo-canvas');
         const startBtn = document.getElementById('start-btn');
@@ -129,7 +130,7 @@ animation.start();</code></pre>
         const status = document.getElementById('status');
 
         // Initialize the animated text with custom configuration
-        const animatedText = new AnimatedNoiseText(canvas, {
+        const animatedText = new NoSnap.NoSnap(canvas, {
             text: 'ANIMATION',
             cellSize: 2,
             stepPixels: 4,

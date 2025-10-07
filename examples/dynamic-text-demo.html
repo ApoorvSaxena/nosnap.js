@@ -152,8 +152,8 @@
         </ul>
     </div>
 
-    <script type="module">
-        import AnimatedNoiseText from '../src/index.js';
+    <script src="https://cdn.jsdelivr.net/npm/nosnap.js/dist/nosnap.umd.min.js"></script>
+    <script>
         
         let animatedText = null;
         let isAnimating = false;
@@ -164,7 +164,7 @@
             const textInput = document.getElementById('textInput');
             
             try {
-                animatedText = new AnimatedNoiseText(canvas, {
+                animatedText = new NoSnap.NoSnap(canvas, {
                     text: textInput.value,
                     cellSize: 2,
                     stepMs: 32,

@@ -64,7 +64,7 @@ npm run check-server
 ## Creating New Examples
 
 1. Create an HTML file in this directory
-2. Reference the local build: `../dist/nosnap.umd.js`
+2. Reference the CDN build: `https://cdn.jsdelivr.net/npm/nosnap.js/dist/nosnap.umd.min.js`
 3. Add your example to the index.html file
 4. Test with the development server
 
@@ -79,8 +79,8 @@ npm run check-server
 <body>
   <canvas id="canvas" width="800" height="400"></canvas>
   
-  <!-- Use local build -->
-  <script src="../dist/nosnap.umd.js"></script>
+  <!-- Use CDN build -->
+  <script src="https://cdn.jsdelivr.net/npm/nosnap.js/dist/nosnap.umd.min.js"></script>
   <script>
     const canvas = document.getElementById('canvas');
     const animation = new NoSnap(canvas, {
