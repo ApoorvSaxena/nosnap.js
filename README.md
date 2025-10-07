@@ -6,7 +6,7 @@
 
 A JavaScript library for creating animated noise text effects on HTML5 canvas. Transform your text into dynamic, animated noise patterns with smooth transitions and responsive behavior.
 
-![Animated Noise Text Demo](https://apoorv.pro/nosnap.js/examples/)
+[Animated Noise Text Demo](https://apoorv.pro/nosnap.js/examples/)
 
 ## Features
 
