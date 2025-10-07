@@ -16,7 +16,7 @@ export function useNoSnap(options = {}) {
     if (!canvasRef.current) return;
 
     try {
-      animationRef.current = new NoSnap(canvasRef.current, options);
+      animationRef.current = new NoSnap.NoSnap(canvasRef.current, options);
       setError(null);
     } catch (err) {
       setError(err.message);

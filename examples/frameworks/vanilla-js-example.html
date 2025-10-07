@@ -560,7 +560,7 @@
             const status = document.getElementById('basic-status');
 
             try {
-                animations.basic = new NoSnap(canvas, {
+                animations.basic = new NoSnap.NoSnap(canvas, {
                     text: 'HELLO WORLD',
                     cellSize: 2,
                     stepMs: 32
@@ -623,7 +623,7 @@
             const fontSizeValue = document.getElementById('font-size-value');
 
             try {
-                animations.interactive = new NoSnap(canvas, {
+                animations.interactive = new NoSnap.NoSnap(canvas, {
                     text: textInput.value,
                     cellSize: parseInt(cellSizeSlider.value),
                     stepMs: parseInt(speedSlider.value),
@@ -732,7 +732,7 @@
             try {
                 updateCanvasSize();
 
-                animations.responsive = new NoSnap(canvas, {
+                animations.responsive = new NoSnap.NoSnap(canvas, {
                     text: 'RESPONSIVE',
                     cellSize: 2,
                     stepMs: 32,
@@ -792,7 +792,7 @@
                     canvas.width = 280;
                     canvas.height = 200;
 
-                    animations[`multi${index}`] = new NoSnap(canvas, {
+                    animations[`multi${index}`] = new NoSnap.NoSnap(canvas, {
                         text: config.text,
                         cellSize: config.cellSize,
                         stepMs: config.stepMs,
@@ -871,7 +871,7 @@
             };
 
             try {
-                animations.performance = new NoSnap(canvas, {
+                animations.performance = new NoSnap.NoSnap(canvas, {
                     text: 'PERFORMANCE',
                     ...qualityPresets.balanced
                 });
@@ -1012,7 +1012,7 @@
             };
 
             try {
-                animations.themes = new NoSnap(canvas, {
+                animations.themes = new NoSnap.NoSnap(canvas, {
                     text: 'THEMES',
                     ...themes.modern
                 });

@@ -39,7 +39,7 @@ export function useNoSnap(canvasRef, options = {}) {
     if (!canvasRef.value) return;
 
     try {
-      animation.value = new NoSnap(canvasRef.value, options.value || options);
+      animation.value = new NoSnap.NoSnap(canvasRef.value, options.value || options);
       error.value = null;
     } catch (err) {
       error.value = err.message;
